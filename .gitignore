@@ -1,0 +1,16 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.project
+.pydevproject
+.settings/
+
+# Project specific
+logs/
+output/
+*.log
+.env
+.env.*
+!.env.example
