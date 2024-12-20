@@ -23,4 +23,7 @@ class Config:
     API_TEMPERATURE: float = 0.7
     API_MAX_TOKENS: int = 2000
     API_ENDPOINT: str = "https://openapi.monica.im/v1"
-    API_MODEL: str = "gpt-4o"
+    # 模型选择 
+    # gpt-4o gpt-4o-mini
+    # claude-3-5-sonnet-20241022	claude-3-5-haiku-20241022	
+    API_MODEL: str = "gpt-4o-mini"
