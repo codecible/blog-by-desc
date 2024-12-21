@@ -3,27 +3,24 @@ from dataclasses import dataclass
 
 @dataclass
 class Config:
+    """配置类"""
+    
     # API配置
-    MAX_RETRIES: int = 1 #最大重试次数
-    RETRY_DELAY: int = 2 #重试延迟时间
+    API_ENDPOINT = "https://openapi.monica.im/v1"    # Monica API的基础URL
+    AI_MODEL = "gpt-4o-mini"                  # 使用的AI模型
+    API_TEMPERATURE = 0.7                      # 控制输出的随机性 (0.0-1.0)
+    API_MAX_TOKENS = 2000                      # 限制输出的最大长度
+    MAX_RETRIES = 1                           # 最大重试次数
+    RETRY_DELAY = 2                           # 重试延迟时间（秒）
     
     # 缓存配置
-    CACHE_ENABLED: bool = True
-    CACHE_EXPIRE_TIME: int = 3600  # 1小时
+    CACHE_ENABLED = True                      # 是否启用缓存
+    CACHE_EXPIRE_TIME = 3600                  # 缓存过期时间（秒）
     
     # 日志配置
-    LOG_LEVEL: str = "INFO"
-    LOG_FORMAT: str = "[%(asctime)s] [%(levelname)s] [%(module)s] [%(funcName)s] [%(lineno)d] %(message)s"
+    LOG_LEVEL = "INFO"                        # 日志级别
+    LOG_FORMAT = "[%(asctime)s] [%(levelname)s] [%(name)s:%(funcName)s:%(lineno)d] %(message)s"
     
-    # 文章生成配置的字数限制
-    MIN_WORD_COUNT: int = 500
-    MAX_WORD_COUNT: int = 1000 
-    
-    # API 调用配置
-    API_TEMPERATURE: float = 0.7
-    API_MAX_TOKENS: int = 2000
-    API_ENDPOINT: str = "https://openapi.monica.im/v1"
-    # 模型选择 
-    # gpt-4o gpt-4o-mini
-    # claude-3-5-sonnet-20241022	claude-3-5-haiku-20241022	
-    API_MODEL: str = "gpt-4o-mini"
+    # 文章配置
+    MIN_WORD_COUNT = 500                      # 文章最小字数
+    MAX_WORD_COUNT = 1000                     # 文章最大字数

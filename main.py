@@ -1,28 +1,14 @@
-import os
 import sys
-import logging
 import asyncio
-from datetime import datetime
-from src.article_generator import ArticleGenerator
-from src.config import Config
+import logging
 from typing import Optional
 
-def setup_logging():
-    """设置日志配置"""
-    os.makedirs('logs', exist_ok=True)
-    config = Config()
-    logging.basicConfig(
-        level=getattr(logging, config.LOG_LEVEL),
-        format=config.LOG_FORMAT,
-        handlers=[
-            logging.FileHandler(f'logs/{datetime.now().strftime("%Y%m%d")}.log', encoding='utf-8'),
-            logging.StreamHandler()
-        ]
-    )
+from src.utils.logger import setup_logging
+from src.generators.blog_generator import BlogGenerator
 
 async def generate_article(description: str, core_idea: Optional[str] = None) -> str:
     """异步生成文章"""
-    generator = ArticleGenerator()
+    generator = BlogGenerator()
     
     # 并发生成写作方向和标题
     directions = await generator.generate_directions(description, core_idea)
@@ -36,7 +22,8 @@ async def generate_article(description: str, core_idea: Optional[str] = None) ->
     return filename
 
 def main():
-    setup_logging()
+    # 设置日志
+    logger = setup_logging()
     
     # 检查参数
     if len(sys.argv) < 2:
@@ -51,7 +38,7 @@ def main():
         print(f"文章已生成并保存到：{filename}")
         
     except Exception as e:
-        logging.error(f"程序执行出错: {str(e)}")
+        logger.error(f"程序执行出错: {str(e)}")
         print(f"发生错误: {str(e)}")
         sys.exit(1)
 

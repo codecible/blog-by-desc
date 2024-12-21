@@ -14,3 +14,6 @@ output/
 .env
 .env.*
 !.env.example
+
+# Cache
+cache/
