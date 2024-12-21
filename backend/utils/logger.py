@@ -1,7 +1,7 @@
 import os
 import logging
 from datetime import datetime
-from ..config import Config
+from backend.config import Config
 
 def setup_logging():
     """设置日志配置"""
@@ -18,4 +18,4 @@ def setup_logging():
             logging.StreamHandler()
         ]
     )
-    return logging.getLogger(__name__) 
+    return logging.getLogger(__name__)
