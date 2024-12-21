@@ -15,6 +15,31 @@
 - 🎯 支持自定义角色设定
 - 🔍 多样化的写作风格
 
+## 项目结构
+
+```
+blog-by-desc/
+├── backend/                 # 后端代码目录
+│   ├── __init__.py         # Python包初始化文件
+│   ├── main.py             # 主程序入口
+│   ├── config.py           # 配置文件
+│   ├── requirements.txt    # Python依赖包
+│   ├── services/           # 服务层目录
+│   │   ├── __init__.py
+│   │   └── blog_generator.py  # 文章生成服务
+│   ├── utils/              # 工具函数目录
+│   │   ├── __init__.py
+│   │   └── logger.py       # 日志工具
+│   ├── models/             # 数据模型目录
+│   ├── routers/            # 路由目录
+│   └── tests/              # 测试目录
+├── frontend/               # 前端代码目录
+├── output/                 # 生成的文章输出目录
+├── docker/                 # Docker相关配置
+├── .env.example           # 环境变量示例文件
+└── .gitignore             # Git忽略文件
+```
+
 ## 系统要求
 
 - Python 3.8+
@@ -26,7 +51,7 @@
 1. 克隆项目到本地：
    ```bash
    git clone [项目地址]
-   cd [项目目录]
+   cd blog-by-desc
    ```
 
 2. 创建并激活虚拟环境（推荐）：
@@ -42,15 +67,12 @@
 
 3. 安装依赖包：
    ```bash
-   # 使用默认源安装
+   cd backend
    pip install -r requirements.txt
-
-   # 或使用国内镜像源安装（推荐国内用户使用）
-   pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
    ```
 
 4. 配置环境变量：
-   - 复制 `.env.example` 文件为 `.env`
+   - 复制项目根目录下的 `.env.example` 文件为 `.env`
    - 在 `.env` 文件中设置你的 Monica AI API密钥：
      ```
      MONICA_API_KEY=your_api_key_here
@@ -60,7 +82,8 @@
 
 基本用法：
 ```bash
-python main.py "文章描述" ["核心主题"]
+# 在项目根目录下运行
+python -m backend.main "文章描述" ["核心主题"]
 ```
 
 参数说明：
@@ -69,7 +92,7 @@ python main.py "文章描述" ["核心主题"]
 
 示例：
 ```bash
-python main.py "探讨人工智能对未来教育的影响" "AI教育革命"
+python -m backend.main "探讨人工智能对未来教育的影响" "AI教育革命"
 ```
 
 ## 生成流程说明
@@ -96,7 +119,7 @@ python main.py "探讨人工智能对未来教育的影响" "AI教育革命"
 
 ## 配置说明
 
-在 `src/config.py` 中可以修改以下配置：
+在 `backend/config.py` 中可以修改以下配置：
 
 ### API配置
 ```python
@@ -108,21 +131,15 @@ MAX_RETRIES = 1                                # 最大重试次数
 RETRY_DELAY = 2                                # 重试延迟时间（秒）
 ```
 
-### 缓存配置
+### 日志配置
 ```python
-CACHE_ENABLED = True      # 是否启用缓存
-CACHE_EXPIRE_TIME = 3600  # 缓存过期时间（秒）
-```
-
-### 文章配置
-```python
-MIN_WORD_COUNT = 500   # 最小字数
-MAX_WORD_COUNT = 1000  # 最大字数
+LOG_LEVEL = "INFO"         # 日志级别
+LOG_FORMAT = "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s"  # 日志格式
 ```
 
 ## 输出说明
 
-1. 生成的文章将保存在 `output` 目录下
+1. 生成的文章将保存在项目根目录的 `output` 目录下
 2. 文件名格式：`YYYYMMDDHHMM.md`
 3. 文件内容包括：
    - 文章标题
@@ -131,7 +148,7 @@ MAX_WORD_COUNT = 1000  # 最大字数
 
 ## 日志说明
 
-- 日志文件位置：`logs` 目录
+- 日志文件位置：项目根目录下的 `logs` 目录
 - 日志文件名格式：`YYYYMMDD.log`
 - 记录内容：
   * API调用情况
@@ -146,11 +163,14 @@ A: 程序会自动重试，如果仍然失败，请检查：
 2. 网络连接是否正常
 3. API额度是否充足
 
-Q: 如何修改生成的文章长度？
-A: 在 `src/config.py` 中修改 `MIN_WORD_COUNT` 和 `MAX_WORD_COUNT` 的值。
+Q: 如何修改生成的文章风格？
+A: 可以修改 `backend/services/blog_generator.py` 中各个生成方法的 system 角色设定。
 
-Q: 如何调整文章的生成风格？
-A: 可以修改 `blog_generator.py` 中各个生成方法的 system 角色设定。
+Q: 为什么运行时提示模块找不到？
+A: 请确保：
+1. 在项目根目录下运行命令
+2. 使用 `python -m backend.main` 的方式运行
+3. 已正确安装所有依赖
 
 ## 注意事项
 

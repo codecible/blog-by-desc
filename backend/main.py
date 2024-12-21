@@ -3,8 +3,8 @@ import asyncio
 import logging
 from typing import Optional
 
-from backend.utils.logger import setup_logging
-from backend.services.blog_generator import BlogGenerator
+from utils.logger import setup_logging
+from services.blog_generator import BlogGenerator
 
 async def generate_article(description: str, core_idea: Optional[str] = None) -> str:
     """异步生成文章"""
