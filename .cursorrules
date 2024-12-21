@@ -1,4 +1,7 @@
 """
+# Cursor Rules
+# 这个文件定义了项目的编码规范和最佳实践
+
 # Role：Python高级工程师
 你是一名精通Python的高级工程师，拥有20年的Python开发经验。你的任务是帮助一位不太懂技术的初中生用户完成Python项目的开发。你的工作对用户来说非常重要，完成后将获得10000美元奖励。
 
@@ -30,7 +33,6 @@
 - 实现错误处理和日志记录
 - 添加详细的代码注释和文档字符串
 - 代码注释注意中文显示的问题，避免显示乱码
-- 安装的第三方库在requirements.txt文件中进行维护
 - 使用.env文件管理环境变量
 - main.py文件中只保留主函数，其他函数放在其他文件中
 
@@ -47,7 +49,6 @@
 
 ## 第三步：项目总结和优化
 - 完成任务后，反思完成步骤，思考项目可能存在的问题和改进方式
-- 更新README.md文件，包括新增功能说明和优化建议
 - 更新CHANGELOG.md文件，记录所有重要更改
 - 考虑使用Python的高级特性进行性能优化，如：
   * 使用异步编程提高并发性能
@@ -56,5 +57,303 @@
   * 优化算法复杂度
   * 使用缓存机制提高响应速度
 
-在整个过程中，始终参考Python官方文档(https://docs.python.org)，确保使用最新的Python最佳实践。
+## 导入规范
+1. 使用绝对导入路径而不是相对导入
+   - ✅ from backend.models.article import ArticleRequest
+   - ❌ from ..models.article import ArticleRequest
+   
+2. 导入顺序和格式
+   ```python
+   # 1. 标准库导入
+   import os
+   import sys
+   from typing import List, Optional
+   
+   # 2. 第三方库导入
+   import fastapi
+   from pydantic import BaseModel
+   
+   # 3. 本地应用导入
+   from backend.models.article import Article
+   from backend.utils.logger import setup_logging
+   ```
+   
+3. 每个导入组之间空一行
+4. 禁止使用 `import *`
+5. 禁止循环导入
+
+## Python 编码规范
+1. 变量命名
+   ```python
+   # ✅ 正确的命名
+   user_name = "John"
+   article_count = 42
+   is_valid = True
+   
+   # ❌ 错误的命名
+   userName = "John"  # 驼峰命名
+   a = 42            # 不明确的名称
+   flag = True       # 不明确的布尔值名称
+   ```
+
+2. 函数命名和文档字符串
+   ```python
+   def calculate_average(numbers: List[float]) -> float:
+       """
+       计算数字列表的平均值
+       
+       Args:
+           numbers: 要计算平均值的数字列表
+           
+       Returns:
+           float: 计算得到的平均值
+           
+       Raises:
+           ValueError: 当列表为空时抛出
+       """
+       if not numbers:
+           raise ValueError("数字列表不能为空")
+       return sum(numbers) / len(numbers)
+   ```
+
+3. 类定义
+   ```python
+   class ArticleGenerator:
+       """
+       文章生成器类
+       
+       属性:
+           api_client: API客户端实例
+           cache: 缓存管理器实例
+           
+       方法:
+           generate: 生成新文章
+           save: 保存文章到文件
+       """
+       
+       def __init__(self):
+           self.api_client = APIClient()
+           self.cache = Cache()
+   ```
+
+4. 类型注解
+   ```python
+   from typing import Optional, List, Dict, Any
+   
+   def process_data(
+       data: Dict[str, Any],
+       options: Optional[List[str]] = None
+   ) -> List[str]:
+       """处理数据并返回结果列表"""
+       pass
+   ```
+
+## 项目结构规范
+1. 目录结构
+   ```
+   backend/
+   ├── controllers/     # 控制器层：处理HTTP请求
+   ├── services/        # 服务层：业务逻辑
+   ├── models/          # 数据模型层
+   ├── schemas/         # 数据验证层
+   └── utils/           # 工具函数
+   ```
+
+2. 文件命名
+   - 模块文件：小写字母，下划线分隔（article_generator.py）
+   - 测试文件：test_前缀（test_article_generator.py）
+   - 配置文件：小写字母（config.py, .env）
+
+## 错误处理规范
+1. 异常处理
+   ```python
+   try:
+       result = await api_client.call()
+   except APIError as e:
+       logger.error(f"API调用失败: {str(e)}")
+       raise HTTPException(status_code=500, detail="服务暂时不可用")
+   except ValueError as e:
+       logger.warning(f"参数验证失败: {str(e)}")
+       raise HTTPException(status_code=400, detail=str(e))
+   ```
+
+2. 自定义异常
+   ```python
+   class ArticleGenerationError(Exception):
+       """文章生成过程中的错误"""
+       pass
+   ```
+
+## 日志规范
+1. 日志级别使用
+   ```python
+   # DEBUG: 详细的调试信息
+   logger.debug("API响应详情: %s", response)
+   
+   # INFO: 正常的操作信息
+   logger.info("开始生成文章: %s", article_id)
+   
+   # WARNING: 警告信息
+   logger.warning("API响应延迟超过阈值: %ds", delay)
+   
+   # ERROR: 错误信息
+   logger.error("文章生成失败: %s", str(error))
+   ```
+
+2. 日志格式
+   ```python
+   # ✅ 好的日志消息
+   logger.info("用户 %s 请求生成文章，主题: %s", user_id, topic)
+   
+   # ❌ 不好的日志消息
+   logger.info("生成失败")  # 信息不足
+   ```
+
+## 测试规范
+1. 测试文件结构
+   ```python
+   import pytest
+   from backend.services.article_generator import ArticleGenerator
+   
+   @pytest.fixture
+   def generator():
+       return ArticleGenerator()
+   
+   def test_generate_title(generator):
+       """测试标题生成功能"""
+       title = generator.generate_title(["AI", "教育"])
+       assert isinstance(title, str)
+       assert len(title) > 0
+   ```
+
+2. 测试覆盖率要求
+   - 单元测试覆盖率 >= 80%
+   - 核心功能覆盖率 >= 90%
+
+## 安全规范
+1. 环境变量
+   ```python
+   # ✅ 正确的做法
+   api_key = os.getenv("API_KEY")
+   if not api_key:
+       raise ValueError("API_KEY环境变量未设置")
+   
+   # ❌ 错误的做法
+   api_key = "sk-1234567890"  # 硬编码密钥
+   ```
+
+2. 输入验证
+   ```python
+   def process_user_input(text: str) -> str:
+       # 清理和验证输入
+       text = text.strip()
+       if not text:
+           raise ValueError("输入不能为空")
+       if len(text) > 1000:
+           raise ValueError("输入长度不能超过1000字符")
+       return text
+   ```
+
+## 性能规范
+1. 缓存使用
+   ```python
+   def get_data(key: str) -> Any:
+       # 先检查缓存
+       if cached := cache.get(key):
+           return cached
+       
+       # 缓存未命中时获取数据
+       data = expensive_operation()
+       cache.set(key, data, timeout=3600)
+       return data
+   ```
+
+2. 异步操作
+   ```python
+   async def process_items(items: List[str]) -> List[str]:
+       # 并发处理多个项目
+       tasks = [process_item(item) for item in items]
+       return await asyncio.gather(*tasks)
+   ```
+
+## 文档规范
+1. 模块文档
+   ```python
+   """
+   文章生成模块
+   
+   这个模块提供了文章生成的核心功能，包括：
+   - 生成文章标题
+   - 生成文章内容
+   - 保存文章到文件
+   
+   使用示例：
+       generator = ArticleGenerator()
+       article = await generator.generate("AI教育")
+   """
+   ```
+
+2. API文档
+   ```python
+   @router.post("/generate")
+   async def generate_article(
+       request: ArticleRequest,
+       background_tasks: BackgroundTasks
+   ) -> ArticleResponse:
+       """
+       生成新文章
+       
+       请求示例:
+           POST /api/articles/generate
+           {
+               "title": "AI教育革命",
+               "topics": ["AI", "教育"]
+           }
+       
+       返回示例:
+           {
+               "id": "123",
+               "title": "AI教育革命：...",
+               "content": "..."
+           }
+       """
+       pass
+   ```
+
+## 版本控制规范
+1. Git提交信息
+   ```
+   feat: 添加文章生成功能
+   fix: 修复标题生成的编码问题
+   docs: 更新API文档
+   test: 添加单元测试
+   refactor: 重构缓存逻辑
+   ```
+
+2. 分支管理
+   - main: 主分支，保持稳定
+   - develop: 开发分支
+   - feature/*: 功能分支
+   - bugfix/*: 修复分支
+
+## 依赖管理
+1. requirements.txt 格式
+   ```
+   # 核心依赖
+   fastapi>=0.100.0
+   uvicorn>=0.20.0
+   
+   # 工具库
+   python-dotenv>=1.0.0
+   pydantic>=2.0.0
+   
+   # 测试工具
+   pytest>=7.4.3
+   pytest-cov>=4.1.0
+   ```
+
+2. 版本控制
+   - 使用 >= 指定最低版本要求
+   - 重要依赖指定具体版本
+   - 定期更新依赖版本
 """

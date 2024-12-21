@@ -14,6 +14,7 @@
 - 📊 详细的日志记录
 - 🎯 支持自定义角色设定
 - 🔍 多样化的写作风格
+- 🌐 支持Web API和命令行两种使用方式
 
 ## 项目结构
 
@@ -21,20 +22,24 @@
 blog-by-desc/
 ├── backend/                 # 后端代码目录
 │   ├── __init__.py         # Python包初始化文件
-│   ├── main.py             # 主程序入口
+│   ├── main.py             # Web服务入口
+│   ├── cli.py              # 命令行工具入口
 │   ├── config.py           # 配置文件
 │   ├── requirements.txt    # Python依赖包
+│   ├── controllers/        # 控制器目录
+│   │   └── article.py      # 文章控制器
 │   ├── services/           # 服务层目录
-│   │   ├── __init__.py
-│   │   └── blog_generator.py  # 文章生成服务
-│   ├── utils/              # 工具函数目录
-│   │   ├── __init__.py
-│   │   └── logger.py       # 日志工具
+│   │   └── article_generator.py  # 文章生成服务
+│   ├── schemas/            # 数据验证模型目录
+│   │   └── article.py      # 文章相关的数据模型
 │   ├── models/             # 数据模型目录
-│   ├── routers/            # 路由目录
+│   │   └── article.py      # 文章数据模型
+│   ├── utils/              # 工具函数目录
+│   │   └── logger.py       # 日志工具
 │   └── tests/              # 测试目录
-├── frontend/               # 前端代码目录
+├── frontend/               # 前端代码目录（待开发）
 ├── output/                 # 生成的文章输出目录
+├── logs/                   # 日志输出目录
 ├── docker/                 # Docker相关配置
 ├── .env.example           # 环境变量示例文件
 └── .gitignore             # Git忽略文件
@@ -44,6 +49,8 @@ blog-by-desc/
 
 - Python 3.8+
 - Monica AI API密钥（支持 GPT-4o-mini 模型）
+- FastAPI (>=0.100.0)
+- Uvicorn (>=0.20.0)
 - OpenAI Python SDK (>=1.3.0)
 
 ## 安装步骤
@@ -80,20 +87,60 @@ blog-by-desc/
 
 ## 使用方法
 
-基本用法：
+本项目提供两种使用方式：命令行工具和Web API服务。
+
+### 1. 命令行工具使用方法
+
+通过命令行直接生成文章：
+
 ```bash
-# 在项目根目录下运行
-python -m backend.main "文章描述" ["核心主题"]
+# 基本用法
+python -m backend.cli <文章描述> [核心主题]
+
+# 示例
+python -m backend.cli "探讨人工智能对未来教育的影响" "AI教育革命"
 ```
 
 参数说明：
 - `文章描述`：（必需）描述你想要生成的文章内容
 - `核心主题`：（可选）文章的核心主题或关键词
 
-示例：
+### 2. Web API服务使用方法
+
+启动Web服务：
 ```bash
-python -m backend.main "探讨人工智能对未来教育的影响" "AI教育革命"
+# 开发模式启动（支持自动重载）
+uvicorn backend.main:app --reload
+
+# 生产模式启动
+uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
+
+API接口使用：
+
+1. 访问API文档：
+   - Swagger UI: http://localhost:8000/docs
+   - ReDoc: http://localhost:8000/redoc
+
+2. 生成文章API：
+   ```bash
+   curl -X POST "http://localhost:8000/blog/generate" \
+        -H "Content-Type: application/json" \
+        -d '{
+            "description": "探讨人工智能对未来教育的影响",
+            "core_idea": "AI教育革命"
+        }'
+   ```
+
+3. API响应示例：
+   ```json
+   {
+     "title": "AI教育革命：5大变革重塑未来课堂",
+     "content": "文章内容...",
+     "directions": ["方向1", "方向2", "方向3"],
+     "file_path": "output/202312211234.md"
+   }
+   ```
 
 ## 生成流程说明
 
@@ -164,7 +211,7 @@ A: 程序会自动重试，如果仍然失败，请检查：
 3. API额度是否充足
 
 Q: 如何修改生成的文章风格？
-A: 可以修改 `backend/services/blog_generator.py` 中各个生成方法的 system 角色设定。
+A: 可以修改 `backend/services/article_generator.py` 中各个生成方法的 system 角色设定。
 
 Q: 为什么运行时提示模块找不到？
 A: 请确保：
@@ -178,6 +225,49 @@ A: 请确保：
 2. 生成的内容质量与输入的描述质量密切相关
 3. 建议在虚拟环境中运行项目，避免依赖冲突
 4. 确保系统安装了 Python 3.8 或更高版本
+
+## 开发环境设置
+
+1. 安装所有依赖（包括开发工具）：
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. 配置开发工具：
+   ```bash
+   # 代码格式化
+   black backend/
+   
+   # import排序
+   isort backend/
+   
+   # 代码检查
+   flake8 backend/
+   
+   # 类型检查
+   mypy backend/
+   ```
+
+3. 运行测试：
+   ```bash
+   # 运行所有测试
+   pytest
+   
+   # 运行测试并生成覆盖率报告
+   pytest --cov=backend tests/
+   ```
+
+4. 开发流程：
+   - 编写代码前运行 `black` 和 `isort` 配置好格式化
+   - 提交代码前运行 `flake8` 和 `mypy` 检查代码质量
+   - 确保所有测试通过并且覆盖率满足要求
+   - 使用 `git commit` 提交代码
+
+5. 推荐的IDE设置：
+   - 启用自动格式化（使用black）
+   - 启用自动import排序（使用isort）
+   - 启用类型检查（使用mypy）
+   - 启用代码检查（使用flake8）
 
 ## 技术支持
 
