@@ -1,12 +1,13 @@
 <script setup>
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { useRouter } from 'vue-router'
+import ArticlePreview from './ArticlePreview.vue'
 
-const router = useRouter()
 const description = ref('')
 const coreTopic = ref('')
 const loading = ref(false)
+const showPreview = ref(false)
+const articleData = ref(null)
 
 const generateArticle = async () => {
   if (!description.value.trim()) {
@@ -45,14 +46,9 @@ const generateArticle = async () => {
     const data = await response.json()
     console.log('收到响应数据:', data)
     
-    router.push({
-      name: 'preview',
-      params: { 
-        title: data.title,
-        directions: JSON.stringify(data.directions),
-        content: data.content
-      }
-    })
+    // 保存文章数据并显示预览
+    articleData.value = data
+    showPreview.value = true
   } catch (error) {
     console.error('发生错误:', error)
     ElMessage.error(error.message || '生成失败，请重试')
@@ -60,44 +56,91 @@ const generateArticle = async () => {
     loading.value = false
   }
 }
+
+const backToForm = () => {
+  showPreview.value = false
+  articleData.value = null
+}
 </script>
 
 <template>
-  <div class="article-form">
-    <h1>AI文章生成器</h1>
-    <div class="form-container">
-      <div class="input-group">
-        <label>内容描述</label>
-        <el-input
-          v-model="description"
-          type="textarea"
-          :rows="6"
-          placeholder="请输入文章内容描述..."
-          resize="none"
-        />
-      </div>
-      
-      <div class="input-group">
-        <label>核心主题</label>
-        <el-input
-          v-model="coreTopic"
-          placeholder="请输入核心主题（选填）..."
-        />
-      </div>
+  <div class="page-container">
+    <!-- 文章生成表单 -->
+    <div v-if="!showPreview" class="article-form">
+      <h1>AI文章生成器</h1>
+      <div class="form-container">
+        <div class="input-group">
+          <label>内容描述</label>
+          <el-input
+            v-model="description"
+            type="textarea"
+            :rows="6"
+            placeholder="请输入文章内容描述..."
+            resize="none"
+          />
+        </div>
+        
+        <div class="input-group">
+          <label>核心主题</label>
+          <el-input
+            v-model="coreTopic"
+            placeholder="请输入核心主题（选填）..."
+          />
+        </div>
 
-      <el-button
-        type="primary"
-        :loading="loading"
-        @click="generateArticle"
-        class="submit-button"
-      >
-        点击自动生成文章
-      </el-button>
+        <el-button
+          type="primary"
+          :loading="loading"
+          @click="generateArticle"
+          class="submit-button"
+        >
+          点击自动生成文章
+        </el-button>
+      </div>
     </div>
+
+    <!-- 文章预览 -->
+    <template v-else>
+      <div class="preview-header">
+        <el-button 
+          type="default" 
+          @click="backToForm"
+          class="back-button"
+        >
+          返回编辑
+        </el-button>
+      </div>
+      <article-preview 
+        :article-data="articleData"
+      />
+    </template>
   </div>
 </template>
 
 <style scoped>
+.page-container {
+  min-height: 100vh;
+  background: var(--background-color);
+}
+
+.preview-header {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.back-button {
+  font-weight: 500;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  transform: translateX(-2px);
+}
+
 .article-form {
   max-width: 800px;
   margin: 0 auto;
