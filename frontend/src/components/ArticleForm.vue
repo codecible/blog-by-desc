@@ -1,25 +1,61 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import ArticlePreview from './ArticlePreview.vue'
 
-const description = ref('')
-const coreTopic = ref('')
+// 表单数据
+const formData = reactive({
+  description: '',
+  coreTopic: ''
+})
+
+// 表单验证规则
+const rules = reactive({
+  description: [
+    { required: true, message: '请输入内容描述', trigger: 'blur' },
+    { min: 10, message: '描述内容至少10个字符', trigger: 'blur' },
+    { max: 1000, message: '描述内容不能超过1000个字符', trigger: 'blur' },
+    { 
+      validator: (rule, value, callback) => {
+        if (value.trim().length < 10) {
+          callback(new Error('描述内容不能全是空格'))
+        } else {
+          callback()
+        }
+      }, 
+      trigger: 'blur' 
+    }
+  ],
+  coreTopic: [
+    { max: 100, message: '核心主题不能超过100个字符', trigger: 'blur' }
+  ]
+})
+
+const formRef = ref(null)
 const loading = ref(false)
 const showPreview = ref(false)
 const articleData = ref(null)
+const errorMessage = ref('')
 
+// 字数统计
+const getWordCount = (text) => {
+  return text.length
+}
+
+// 生成文章
 const generateArticle = async () => {
-  if (!description.value.trim()) {
-    ElMessage.warning('请输入内容描述')
-    return
-  }
-
-  loading.value = true
+  if (!formRef.value) return
+  
   try {
+    // 表单验证
+    await formRef.value.validate()
+    
+    loading.value = true
+    errorMessage.value = ''
+    
     console.log('发送请求数据:', {
-      description: description.value,
-      core_idea: coreTopic.value,
+      description: formData.description,
+      core_idea: formData.coreTopic,
     })
 
     const response = await fetch('/blog/generate', {
@@ -28,8 +64,8 @@ const generateArticle = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        description: description.value,
-        core_idea: coreTopic.value,
+        description: formData.description,
+        core_idea: formData.coreTopic,
       }),
     })
 
@@ -40,18 +76,27 @@ const generateArticle = async () => {
         statusText: response.statusText,
         errorText
       })
-      throw new Error(`请求失败: ${response.status} ${response.statusText}\n${errorText}`)
+      throw new Error(errorText || `请求失败: ${response.status} ${response.statusText}`)
     }
 
     const data = await response.json()
     console.log('收到响应数据:', data)
+    
+    if (!data.success) {
+      throw new Error(data.message || '生成失败，请重试')
+    }
     
     // 保存文章数据并显示预览
     articleData.value = data
     showPreview.value = true
   } catch (error) {
     console.error('发生错误:', error)
-    ElMessage.error(error.message || '生成失败，请重试')
+    errorMessage.value = error.message || '生成失败，请重试'
+    ElMessage.error({
+      message: errorMessage.value,
+      duration: 5000,
+      showClose: true
+    })
   } finally {
     loading.value = false
   }
@@ -60,6 +105,15 @@ const generateArticle = async () => {
 const backToForm = () => {
   showPreview.value = false
   articleData.value = null
+  errorMessage.value = ''
+}
+
+// 重置表单
+const resetForm = () => {
+  if (formRef.value) {
+    formRef.value.resetFields()
+    errorMessage.value = ''
+  }
 }
 </script>
 
@@ -69,33 +123,82 @@ const backToForm = () => {
     <div v-if="!showPreview" class="article-form">
       <h1>AI文章生成器</h1>
       <div class="form-container">
-        <div class="input-group">
-          <label>内容描述</label>
-          <el-input
-            v-model="description"
-            type="textarea"
-            :rows="6"
-            placeholder="请输入文章内容描述..."
-            resize="none"
-          />
-        </div>
-        
-        <div class="input-group">
-          <label>核心主题</label>
-          <el-input
-            v-model="coreTopic"
-            placeholder="请输入核心主题（选填）..."
-          />
-        </div>
-
-        <el-button
-          type="primary"
-          :loading="loading"
-          @click="generateArticle"
-          class="submit-button"
+        <el-form
+          ref="formRef"
+          :model="formData"
+          :rules="rules"
+          label-position="top"
+          @submit.prevent
         >
-          点击自动生成文章
-        </el-button>
+          <div class="input-group">
+            <el-form-item 
+              label="内容描述" 
+              prop="description"
+              :error="errorMessage"
+            >
+              <el-input
+                v-model="formData.description"
+                type="textarea"
+                :rows="6"
+                placeholder="请输入文章内容描述..."
+                resize="none"
+                maxlength="1000"
+                show-word-limit
+              />
+              <div class="input-tips">
+                <el-alert
+                  v-if="formData.description.length < 10"
+                  title="建议：描述越详细，生成的文章质量越高"
+                  type="info"
+                  :closable="false"
+                  show-icon
+                />
+              </div>
+            </el-form-item>
+          </div>
+          
+          <div class="input-group">
+            <el-form-item 
+              label="核心主题" 
+              prop="coreTopic"
+            >
+              <el-input
+                v-model="formData.coreTopic"
+                placeholder="请输入核心主题（选填）..."
+                maxlength="100"
+                show-word-limit
+              />
+              <div class="input-tips">
+                <el-alert
+                  title="提示：核心主题可以帮助AI更好地把握文章重点"
+                  type="info"
+                  :closable="false"
+                  show-icon
+                />
+              </div>
+            </el-form-item>
+          </div>
+
+          <div class="form-actions">
+            <el-button
+              type="primary"
+              :loading="loading"
+              @click="generateArticle"
+              class="submit-button"
+            >
+              {{ loading ? '正在生成文章...' : '点击自动生成文章' }}
+            </el-button>
+            
+            <el-button
+              type="default"
+              @click="resetForm"
+              :disabled="loading"
+              class="reset-button"
+            >
+              重置表单
+            </el-button>
+          </div>
+        </el-form>
       </div>
     </div>
 
@@ -153,6 +256,9 @@ h1 {
   color: #1d1d1f;
   text-align: center;
   margin-bottom: 40px;
+  background: linear-gradient(135deg, #1d1d1f 0%, #434343 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .form-container {
@@ -167,12 +273,26 @@ h1 {
   margin-bottom: 24px;
 }
 
-.input-group label {
-  display: block;
+.input-group :deep(.el-form-item__label) {
   font-size: 1rem;
   font-weight: 500;
   color: #1d1d1f;
   margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.input-tips {
+  margin-top: 8px;
+}
+
+.input-tips :deep(.el-alert) {
+  background: transparent;
+  padding: 0;
+}
+
+.input-tips :deep(.el-alert__title) {
+  font-size: 0.9rem;
+  color: #6e6e73;
 }
 
 :deep(.el-input__wrapper) {
@@ -198,10 +318,21 @@ h1 {
   line-height: 1.5;
 }
 
+:deep(.el-input__count) {
+  background: transparent;
+  font-size: 0.9rem;
+  color: #6e6e73;
+}
+
+.form-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+}
+
 .submit-button {
-  width: 100%;
+  flex: 2;
   height: 50px;
-  margin-top: 20px;
   font-size: 1.1rem;
   font-weight: 500;
   border-radius: 12px;
@@ -217,5 +348,42 @@ h1 {
 
 .submit-button:active {
   transform: translateY(0);
+}
+
+.reset-button {
+  flex: 1;
+  height: 50px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.reset-button:hover {
+  background: #f5f5f7;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .article-form {
+    padding: 20px 10px;
+  }
+  
+  .form-container {
+    padding: 20px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .submit-button,
+  .reset-button {
+    width: 100%;
+  }
 }
 </style> 
