@@ -16,6 +16,11 @@ const generateArticle = async () => {
 
   loading.value = true
   try {
+    console.log('发送请求数据:', {
+      description: description.value,
+      core_idea: coreTopic.value,
+    })
+
     const response = await fetch('/blog/generate', {
       method: 'POST',
       headers: {
@@ -28,10 +33,18 @@ const generateArticle = async () => {
     })
 
     if (!response.ok) {
-      throw new Error('生成失败')
+      const errorText = await response.text()
+      console.error('请求失败:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText
+      })
+      throw new Error(`请求失败: ${response.status} ${response.statusText}\n${errorText}`)
     }
 
     const data = await response.json()
+    console.log('收到响应数据:', data)
+    
     router.push({
       name: 'preview',
       params: { 
@@ -41,6 +54,7 @@ const generateArticle = async () => {
       }
     })
   } catch (error) {
+    console.error('发生错误:', error)
     ElMessage.error(error.message || '生成失败，请重试')
   } finally {
     loading.value = false
