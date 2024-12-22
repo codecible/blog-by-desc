@@ -5,32 +5,30 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+
 ## Unreleased
 ### Added
-- 项目代码重构，将现有Python代码迁移到`backend`目录
-- 创建FastAPI标准目录结构
-- 迁移现有生成逻辑到服务层
-- 创建Vue 3项目，设置前端项目结构
-- 配置Element Plus和必要依赖
-- 创建Docker化项目结构
-- 添加Docker Compose文件
-- 添加VSCode Remote Container配置
-- 添加VSCode Docker插件
-- 添加README.md文档
-- 添加项目结构.md文档
-- 添加项目改造.md文档   
+- 生成的文章在网站上展示
 
-## [0.1.1] - 2024-12-21
+## [0.1.2] - 2024-12-22
 
 ### Added
-- Monica AI API 集成
-- 文章生成核心功能
-- 缓存机制
-- 异步处理支持
-- 代码结构化
-- 增加CHANGELOG.md更新日志维护
+- 增强API文档功能
+  * 添加详细的API请求/响应模型说明
+  * 添加字段级别的验证规则和说明
+  * 添加示例数据
+  * 完善错误响应模型
+- 优化数据模型结构
+  * 添加基础响应模型（BaseResponse）
+  * 添加统一的错误处理模型
+  * 规范化API响应格式
 
 ### Changed
+- - 项目代码重构，将现有Python代码迁移到`backend`目录
+- 将 `controllers` 目录重命名为 `routers`，更符合FastAPI最佳实践
+- 优化 `schemas` 目录结构，增强数据验证
+- 更新项目文档，完善目录结构说明
+- 删除未实现的预览功能相关代码
 - API 调用重试机制
 - 日志记录系统
 

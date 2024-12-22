@@ -16,6 +16,19 @@
 - 🔍 多样化的写作风格
 - 🌐 支持Web API和命令行两种使用方式
 
+## 技术栈
+- 前端：Vue 3 + Vite + Element Plus + Pinia
+- 后端：Python FastAPI
+- 开发工具：VSCode
+- 包管理：npm(前端)、pip(后端)
+- 容器化：Docker + Docker Compose
+
+## 环境要求
+- Docker >= 20.10.0
+- Docker Compose >= 2.0.0
+- VSCode + Docker 插件
+- VSCode + Remote Container 插件
+
 ## 项目结构
 
 ```
@@ -26,12 +39,15 @@ blog-by-desc/
 │   ├── cli.py              # 命令行工具入口
 │   ├── config.py           # 配置文件
 │   ├── requirements.txt    # Python依赖包
-│   ├── controllers/        # 控制器目录
-│   │   └── article.py      # 文章控制器
+│   ├── routers/            # 路由处理目录
+│   │   └── article.py      # 文章相关路由
 │   ├── services/           # 服务层目录
 │   │   └── article_generator.py  # 文章生成服务
 │   ├── schemas/            # 数据验证模型目录
-│   │   └── article.py      # 文章相关的数据模型
+│   │   ├── __init__.py     # 包初始化文件
+│   │   ├── article.py      # 文章相关的数据模型
+│   │   ├── base.py         # 基础数据模型
+│   │   └── errors.py       # 错误响应模型
 │   ├── models/             # 数据模型目录
 │   │   └── article.py      # 文章数据模型
 │   ├── utils/              # 工具函数目录
@@ -58,6 +74,36 @@ blog-by-desc/
 ├── .env.example           # 环境变量示例文件
 └── .gitignore             # Git忽略文件
 ```
+
+### 目录功能详细描述
+
+#### backend/routers
+1. 处理HTTP请求路由
+2. 参数验证和错误处理
+3. 调用相应的服务层处理业务逻辑
+4. 返回处理结果
+
+#### backend/schemas
+1. 定义请求和响应的数据模型
+2. 提供数据验证规则
+   - 字段类型检查
+   - 长度限制
+   - 格式验证
+   - 自定义验证规则
+3. 自动生成API文档
+   - 请求/响应模型说明
+   - 字段说明
+   - 示例数据
+4. 错误处理模型
+   - 统一的错误响应格式
+   - 错误码定义
+   - 详细的错误信息
+
+#### backend/services
+1. 实现核心业务逻辑
+2. 调用外部API服务
+3. 处理数据转换
+4. 实现缓存机制
 
 ## 系统要求
 
@@ -130,31 +176,11 @@ uvicorn backend.main:app --reload
 uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
-API接口使用：
+## API接口：
 
 1. 访问API文档：
    - Swagger UI: http://localhost:8000/docs
    - ReDoc: http://localhost:8000/redoc
-
-2. 生成文章API：
-   ```bash
-   curl -X POST "http://localhost:8000/blog/generate" \
-        -H "Content-Type: application/json" \
-        -d '{
-            "description": "探讨人工智能对未来教育的影响",
-            "core_idea": "AI教育革命"
-        }'
-   ```
-
-3. API响应示例：
-   ```json
-   {
-     "title": "AI教育革命：5大变革重塑未来课堂",
-     "content": "文章内容...",
-     "directions": ["方向1", "方向2", "方向3"],
-     "file_path": "output/202312211234.md"
-   }
-   ```
 
 ## 生成流程说明
 
@@ -293,3 +319,77 @@ A: 请确保：
 ## 许可证
 
 MIT License
+
+## API文档
+
+### 1. 文档访问
+- Swagger UI: http://localhost:8000/docs
+  * 交互式API文档
+  * 支持在线测试API
+  * 查看请求/响应模型
+  * 查看验证规则
+- ReDoc: http://localhost:8000/redoc
+  * 更清晰的文档阅读体验
+  * 适合分享给团队成员
+
+### 2. 请求/响应格式
+
+#### 2.1 文章生成请求
+```json
+{
+    "description": "探讨人工智能对未来教育的影响",
+    "core_idea": "AI教育革命"
+}
+```
+- `description`: 文章描述（必填，5-1000字）
+- `core_idea`: 核心主题（选填，最多100字）
+
+#### 2.2 成功响应
+```json
+{
+    "success": true,
+    "message": "文章生成成功",
+    "data": {
+        "title": "揭秘AI如何定制个性化学习，提升学生成绩的3大关键",
+        "content": "# 揭秘AI如何定制个性化学习...",
+        "directions": [
+            "个性化学习：AI如何根据学生需求定制教育内容",
+            "教师角色转变：AI在课堂中的辅助与替代",
+            "未来技能培养：AI时代需要的核心素养"
+        ],
+        "file_path": "output/202312211234.md"
+    }
+}
+```
+
+#### 2.3 错误响应
+```json
+{
+    "code": 400,
+    "message": "请求参数错误",
+    "details": "文章描述不能为空"
+}
+```
+
+### 3. 错误码说明
+- 400: 请求参数错误
+- 404: 资源未找到
+- 500: 服务器内部错误
+
+### 4. 数据验证规则
+- 文章描述：
+  * 必填字段
+  * 最小长度：5个字符
+  * 最大长度：1000个字符
+- 核心主题：
+  * 选填字段
+  * 最大长度：100个字符
+
+### 5. 响应字段说明
+- `success`: 请求是否成功
+- `message`: 响应消息
+- `data`: 文章数据
+  * `title`: 生成的文章标题
+  * `content`: 生成的文章内容（Markdown格式）
+  * `directions`: 文章的写作方向列表
+  * `file_path`: 文章保存的文件路径

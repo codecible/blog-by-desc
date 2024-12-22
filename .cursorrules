@@ -1,4 +1,3 @@
-"""
 # Cursor Rules
 # 这个文件定义了项目的编码规范和最佳实践
 
@@ -35,8 +34,9 @@
 - 代码注释注意中文显示的问题，避免显示乱码
 - 使用.env文件管理环境变量
 - main.py文件中只保留主函数，其他函数放在其他文件中
+- 遵循下面所定义的项目规范中所有内容
 
-### 日志管理：
+### 代码日志管理：
 - 使用logging库进行日志管理，日志级别为INFO
 - 日志文件名称为当前日期，如20241220.log，保存到logs目录下
 - 日志格式为：[时间] [日志级别] [模块名] [函数名] [行号] [日志内容]
@@ -49,7 +49,8 @@
 
 ## 第三步：项目总结和优化
 - 完成任务后，反思完成步骤，思考项目可能存在的问题和改进方式
-- 更新CHANGELOG.md文件，记录所有重要更改
+- 每次有较大改动时，更新README.md 和 CHANGELOG.md 文件，记录所有重要更改
+- 当用户主动提出记录更新时，更新CHANGELOG.md 和 README.md 文件，记录所有重要更改
 - 考虑使用Python的高级特性进行性能优化，如：
   * 使用异步编程提高并发性能
   * 使用生成器减少内存使用
@@ -57,6 +58,7 @@
   * 优化算法复杂度
   * 使用缓存机制提高响应速度
 
+# 项目规范
 ## 导入规范
 1. 使用绝对导入路径而不是相对导入
    - ✅ from backend.models.article import ArticleRequest
@@ -149,17 +151,7 @@
    ```
 
 ## 项目结构规范
-1. 目录结构
-   ```
-   backend/
-   ├── controllers/     # 控制器层：处理HTTP请求
-   ├── services/        # 服务层：业务逻辑
-   ├── models/          # 数据模型层
-   ├── schemas/         # 数据验证层
-   └── utils/           # 工具函数
-   ```
-
-2. 文件命名
+1. 文件命名
    - 模块文件：小写字母，下划线分隔（article_generator.py）
    - 测试文件：test_前缀（test_article_generator.py）
    - 配置文件：小写字母（config.py, .env）
@@ -276,66 +268,6 @@
        return await asyncio.gather(*tasks)
    ```
 
-## 文档规范
-1. 模块文档
-   ```python
-   """
-   文章生成模块
-   
-   这个模块提供了文章生成的核心功能，包括：
-   - 生成文章标题
-   - 生成文章内容
-   - 保存文章到文件
-   
-   使用示例：
-       generator = ArticleGenerator()
-       article = await generator.generate("AI教育")
-   """
-   ```
-
-2. API文档
-   ```python
-   @router.post("/generate")
-   async def generate_article(
-       request: ArticleRequest,
-       background_tasks: BackgroundTasks
-   ) -> ArticleResponse:
-       """
-       生成新文章
-       
-       请求示例:
-           POST /api/articles/generate
-           {
-               "title": "AI教育革命",
-               "topics": ["AI", "教育"]
-           }
-       
-       返回示例:
-           {
-               "id": "123",
-               "title": "AI教育革命：...",
-               "content": "..."
-           }
-       """
-       pass
-   ```
-
-## 版本控制规范
-1. Git提交信息
-   ```
-   feat: 添加文章生成功能
-   fix: 修复标题生成的编码问题
-   docs: 更新API文档
-   test: 添加单元测试
-   refactor: 重构缓存逻辑
-   ```
-
-2. 分支管理
-   - main: 主分支，保持稳定
-   - develop: 开发分支
-   - feature/*: 功能分支
-   - bugfix/*: 修复分支
-
 ## 依赖管理
 1. requirements.txt 格式
    ```
@@ -356,4 +288,3 @@
    - 使用 >= 指定最低版本要求
    - 重要依赖指定具体版本
    - 定期更新依赖版本
-"""
