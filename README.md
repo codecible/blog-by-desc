@@ -37,7 +37,21 @@ blog-by-desc/
 │   ├── utils/              # 工具函数目录
 │   │   └── logger.py       # 日志工具
 │   └── tests/              # 测试目录
-├── frontend/               # 前端代码目录（待开发）
+├── frontend/               # 前端代码目录
+│   ├── src/               # 源代码目录
+│   │   ├── components/    # Vue组件目录
+│   │   │   ├── ArticleForm.vue    # 文章生成表单组件
+│   │   │   └── ArticlePreview.vue # 文章预览组件
+│   │   ├── router/        # 路由配置目录
+│   │   │   └── index.js   # 路由配置文件
+│   │   ├── App.vue        # 根组件
+│   │   └── main.js        # 应用入口文件
+│   ├── css/               # 样式文件目录
+│   ├── js/                # JavaScript文件目录
+│   ├── index.html         # HTML入口文件
+│   ├── package.json       # 项目依赖配置
+│   ├── vite.config.js     # Vite配置文件
+│   └── .npmrc             # NPM配置文件
 ├── output/                 # 生成的文章输出目录
 ├── logs/                   # 日志输出目录
 ├── docker/                 # Docker相关配置
