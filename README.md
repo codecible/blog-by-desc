@@ -51,6 +51,8 @@ blog-by-desc/
 │   ├── cli.py              # 命令行工具入口
 │   ├── config.py           # 配置文件
 │   ├── requirements.txt    # Python依赖包
+│   ├── .env.example        # 环境变量示例文件
+│   ├── .env                # 环境变量配置文件
 │   ├── routers/            # 路由处理目录
 │   │   └── article.py      # 文章相关路由
 │   ├── services/           # 服务层目录
@@ -151,8 +153,8 @@ blog-by-desc/
    ```
 
 4. 配置环境变量：
-   - 复制项目根目录下的 `.env.example` 文件为 `.env`
-   - 在 `.env` 文件中设置你的 Monica AI API密钥：
+   - 复制 `backend/.env.example` 文件为 `backend/.env`
+   - 在 `backend/.env` 文件中设置你的 Monica AI API密钥：
      ```
      MONICA_API_KEY=your_api_key_here
      ```
