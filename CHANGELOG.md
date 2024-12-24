@@ -7,7 +7,22 @@
 
 
 ## Unreleased
+
+## [0.3.0] - 2024-12-24
 ### Added
+- Docker部署优化
+  * 添加前后端独立的 `.dockerignore` 文件
+  * 优化 Docker 构建上下文
+  * 实现非root用户运行容器
+  * 使用docker-compose管理容器
+- 部署至aliyun
+
+### Changed
+- 调整 Docker 相关配置
+  * 更新 Python 基础镜像到 3.11
+  * 优化构建流程和文件组织
+  * 分离前后端构建上下文
+  * 删除根目录冗余的 `.dockerignore` 文件
 
 ## [0.2.0] - 2024-12-22
 

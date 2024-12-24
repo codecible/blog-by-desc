@@ -9,6 +9,7 @@
 - 🎨 优化的文章展示效果
 - 📱 完善的移动端适配
 - 🚀 更流畅的用户体验
+- 🔒 Docker-compose部署
 
 ## 功能特点
 
@@ -20,9 +21,6 @@
 - 📦 内置缓存机制减少API调用
 - 🛡️ 完善的错误处理和重试机制
 - 📊 详细的日志记录
-- 🎯 支持自定义角色设定
-- 🔍 多样化的写作风格
-- 🌐 支持Web API和命令行两种使用方式
 - 📱 响应式设计，支持移动端
 - 📋 一键复制文章内容
 - 💾 下载为Markdown文件
@@ -33,13 +31,11 @@
 - 后端：Python FastAPI
 - 开发工具：VSCode
 - 包管理：npm(前端)、pip(后端)
-- 容器化：Docker + Docker Compose
+- 容器化：Docker Compose
 
 ## 环境要求
-- Docker >= 20.10.0
 - Docker Compose >= 2.0.0
-- VSCode + Docker 插件
-- VSCode + Remote Container 插件
+- VSCode + Remote Container 插件(推荐 Dev Container)
 
 ## 项目结构
 
@@ -85,7 +81,6 @@ blog-by-desc/
 ├── output/                 # 生成的文章输出目录
 ├── logs/                   # 日志输出目录
 ├── docker/                 # Docker相关配置
-├── .env.example           # 环境变量示例文件
 └── .gitignore             # Git忽略文件
 ```
 
@@ -119,14 +114,6 @@ blog-by-desc/
 3. 处理数据转换
 4. 实现缓存机制
 
-## 系统要求
-
-- Python 3.8+
-- Monica AI API密钥（支持 GPT-4o-mini 模型）
-- FastAPI (>=0.100.0)
-- Uvicorn (>=0.20.0)
-- OpenAI Python SDK (>=1.3.0)
-
 ## 安装步骤
 
 1. 克隆项目到本地：
@@ -134,6 +121,12 @@ blog-by-desc/
    git clone [项目地址]
    cd blog-by-desc
    ```
+2. 配置环境变量：
+   - 复制 `backend/.env.example` 文件为 `backend/.env`
+   - 在 `backend/.env` 文件中设置你的 Monica AI API密钥：
+     ```
+     MONICA_API_KEY=your_api_key_here
+     ```
 
 2. 创建并激活虚拟环境（推荐）：
    ```bash
@@ -152,12 +145,7 @@ blog-by-desc/
    pip install -r requirements.txt
    ```
 
-4. 配置环境变量：
-   - 复制 `backend/.env.example` 文件为 `backend/.env`
-   - 在 `backend/.env` 文件中设置你的 Monica AI API密钥：
-     ```
-     MONICA_API_KEY=your_api_key_here
-     ```
+
 
 ## 使用方法
 
@@ -207,27 +195,7 @@ python -m backend.cli "探讨人工智能对未来教育的影响" "AI教育革�
    - Swagger UI: http://localhost:8000/docs
    - ReDoc: http://localhost:8000/redoc
 
-## 生成流程说明
 
-### 1. 生成写作方向
-- 由资深内容策划专家角色生成
-- 紧密结合描述内容和核心主题
-- 考虑当前社会热点与读者兴趣
-- 输出3-5个清晰的写作方向
-
-### 2. 生成文章标题
-- 由自媒体内容策划专家角色生成
-- 标题长度控制在10-25字之间
-- 优先使用数字/具体数据
-- 包含吸引眼球的关键词
-- 生成3个备选标题供选择
-
-### 3. 生成文章内容
-- 由经验丰富的自媒体创作者角色生成
-- 确保内容结构清晰，层层递进
-- 使用通俗易懂的语言
-- 通过故事化叙述增加趣味性
-- 适当加入数据支持论点
 
 ## 配置说明
 
@@ -266,73 +234,6 @@ LOG_FORMAT = "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s"  # 日志格
   * API调用情况
   * 生成进度
   * 错误信息
-
-## 常见问题
-
-Q: API调用失败怎么办？
-A: 程序会自动重试，如果仍然失败，请检查：
-1. API密钥是否正确
-2. 网络连接是否正常
-3. API额度是否充足
-
-Q: 如何修改生成的文章风格？
-A: 可以修改 `backend/services/article_generator.py` 中各个生成方法的 system 角色设定。
-
-Q: 为什么运行时提示模块找不到？
-A: 请确保：
-1. 在项目根目录下运行命令
-2. 使用 `python -m backend.main` 的方式运行
-3. 已正确安装所有依赖
-
-## 注意事项
-
-1. 请确保 Monica AI API 密钥有效且有足够的调用额度
-2. 生成的内容质量与输入的描述质量密切相关
-3. 建议在虚拟环境中运行项目，避免依赖冲突
-4. 确保系统安装了 Python 3.8 或更高版本
-
-## 开发环境设置
-
-1. 安装所有依赖（包括开发工具）：
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. 配置开发工具：
-   ```bash
-   # 代码格式化
-   black backend/
-   
-   # import排序
-   isort backend/
-   
-   # 代码检查
-   flake8 backend/
-   
-   # 类型检查
-   mypy backend/
-   ```
-
-3. 运行测试：
-   ```bash
-   # 运行所有测试
-   pytest
-   
-   # 运行测试并生成覆盖率报告
-   pytest --cov=backend tests/
-   ```
-
-4. 开发流程：
-   - 编写代码前运行 `black` 和 `isort` 配置好格式化
-   - 提交代码前运行 `flake8` 和 `mypy` 检查代码质量
-   - 确保所有测试通过并且覆盖率满足要求
-   - 使用 `git commit` 提交代码
-
-5. 推荐的IDE设置：
-   - 启用自动格式化（使用black）
-   - 启用自动import排序（使用isort）
-   - 启用类型检查（使用mypy）
-   - 启用代码检查（使用flake8）
 
 ## 技术支持
 
@@ -418,3 +319,241 @@ MIT License
   * `content`: 生成的文章内容（Markdown格式）
   * `directions`: 文章的写作方向列表
   * `file_path`: 文章保存的文件路径
+
+## 使用Docker Compose部署
+
+1. 确保已安装Docker和Docker Compose
+   ```bash
+   docker --version
+   docker-compose --version
+   ```
+
+2. 配置环境变量
+   ```bash
+   cp ./backend/.env.example ./backend/.env
+   # 编辑.env文件，设置MONICA_API_KEY
+   ```
+
+3. 构建和启动服务
+   ```bash
+   # 构建镜像并启动容器
+   docker-compose up --build
+
+   # 后台运行
+   docker-compose up -d --build
+   ```
+
+4. 访问服务
+   - 前端页面：http://localhost:5173
+   - 后端API文档：http://localhost:8000/docs
+
+5. 停止服务
+   ```bash
+   # 停止并移除容器
+   docker-compose down
+
+   # 停止并移除容器及镜像
+   docker-compose down --rmi all
+   ```
+
+### Docker开发提示
+
+1. 查看容器日志
+   ```bash
+   # 查看所有容器日志
+   docker-compose logs
+
+   # 查看特定服务日志
+   docker-compose logs backend
+   docker-compose logs frontend
+   ```
+
+2. 进入容器
+   ```bash
+   # 进入后端容器
+   docker-compose exec backend bash
+
+   # 进入前端容器
+   docker-compose exec frontend sh
+   ```
+
+3. 重启服务
+   ```bash
+   # 重启所有服务
+   docker-compose restart
+
+   # 重启特定服务
+   docker-compose restart backend
+   docker-compose restart frontend
+   ```
+
+4. 开发模式
+   - 已配置热重载，修改代码后会自动更新
+   - 前端代码修改会自动编译
+   - 后端代码修改会自动重启服务
+
+5. 常见问题
+   - 如果遇到权限问题，可能需要调整目录权限：
+     ```bash
+     sudo chown -R $USER:$USER .
+     ```
+   - 如果端口被占用，可以在docker-compose.yml中修改端口映射
+
+## 快速开始
+
+### 1. Docker部署（推荐）
+
+这是最简单的启动方式，确保你已安装：
+- Docker >= 20.10.0
+- Docker Compose >= 2.0.0
+
+```bash
+# 1. 克隆项目
+git clone [项目地址]
+cd blog-by-desc
+
+# 2. 配置环境变量
+cp .env.example .env
+# 编辑 .env 文件，设置 MONICA_API_KEY
+
+# 3. 启动服务
+docker-compose up -d --build
+
+# 4. 访问服务
+# 前端界面：http://localhost:5173
+# API文档：http://localhost:8000/docs
+```
+
+### 2. 本地开发环境（可选）
+
+如果你想在本地开发，请参考[开发环境设置](#开发环境设置)部分。
+
+## Docker部署详解
+
+### 目录结构
+```
+blog-by-desc/
+├── backend/
+│   ├── .dockerignore    # 后端构建忽略规则
+│   └── ...
+├── frontend/
+│   ├── .dockerignore    # 前端构建忽略规则
+│   └── ...
+├── docker/
+│   ├── backend.Dockerfile
+│   └── frontend.Dockerfile
+└── docker-compose.yml
+```
+
+### 部署说明
+
+1. 服务组件
+   - 后端服务（Python FastAPI）
+     * 运行在 8000 端口
+     * 使用非root用户运行
+     * 支持热重载开发
+   - 前端服务（Vue.js）
+     * 运行在 5173 端口
+     * 支持热更新
+     * 自动编译
+
+2. 数据持久化
+   ```yaml
+   volumes:
+     - ./backend:/app/backend:ro  # 源代码（只读）
+     - ./output:/app/output       # 生成的文章
+     - ./logs:/app/logs          # 日志文件
+   ```
+
+3. 环境变量
+   - 在 `.env` 文件中配置
+   - 支持的变量：
+     * `MONICA_API_KEY`：API密钥
+     * 其他配置参见 `.env.example`
+
+4. 安全特性
+   - 使用非root用户运行容器
+   - 源代码目录只读挂载
+   - 合理的文件权限设置
+   - 独立的构建上下文
+
+### 常用操作
+
+1. 服务管理
+   ```bash
+   # 启动服务
+   docker-compose up -d
+
+   # 停止服务
+   docker-compose down
+
+   # 重启服务
+   docker-compose restart
+
+   # 查看日志
+   docker-compose logs -f
+   ```
+
+2. 开发模式
+   ```bash
+   # 启动开发模式（带实时日志）
+   docker-compose up
+
+   # 重新构建（代码更新后）
+   docker-compose up --build
+   ```
+
+3. 容器管理
+   ```bash
+   # 进入容器
+   docker-compose exec backend bash
+   docker-compose exec frontend sh
+
+   # 查看容器状态
+   docker-compose ps
+   ```
+
+4. 文件权限（如果遇到权限问题）
+   ```bash
+   # 设置目录权限
+   sudo chown -R $USER:$USER .
+   sudo chmod -R 755 .
+   ```
+
+### 故障排除
+
+1. 容器无法启动
+   - 检查端口占用：`lsof -i :8000` 和 `lsof -i :5173`
+   - 检查日志：`docker-compose logs`
+   - 确认环境变量已正确设置
+
+2. 文件权限问题
+   - 运行权限修复命令（见上文）
+   - 确认 output 和 logs 目录存在且有正确权限
+
+3. 热重载不工作
+   - 检查 volume 挂载是否正确
+   - 确认代码保存时没有语法错误
+
+4. API调用失败
+   - 验证 MONICA_API_KEY 是否正确设置
+   - 检查网络连接
+   - 查看后端日志
+
+## 最佳实践
+
+1. 开发流程
+   - 使用 Docker 开发环境保持一致性
+   - 遵循代码规范和提交规范
+   - 定期更新依赖版本
+
+2. 部署建议
+   - 生产环境使用固定版本标签
+   - 定期备份 output 目录
+   - 监控容器日志和状态
+
+3. 安全建议
+   - 定期更新基础镜像
+   - 不在容器中存储敏感信息
+   - 使用非root用户运行服务
+   - 限制容器资源使用

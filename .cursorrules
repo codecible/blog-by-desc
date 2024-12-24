@@ -34,13 +34,7 @@
 - 代码注释注意中文显示的问题，避免显示乱码
 - 使用.env文件管理环境变量
 - main.py文件中只保留主函数，其他函数放在其他文件中
-- 遵循下面所定义的项目规范中所有内容
-
-### 代码日志管理：
-- 使用logging库进行日志管理，日志级别为INFO
-- 日志文件名称为当前日期，如20241220.log，保存到logs目录下
-- 日志格式为：[时间] [日志级别] [模块名] [函数名] [行号] [日志内容]
-- 日志内容应包括：用户需求、用户反馈、代码执行情况、错误信息等
+- 遵循下面所定义的「项目规范」中所有内容
 
 ### 解决问题时：
 - 全面阅读相关代码文件，理解所有代码的功能和逻辑
@@ -59,6 +53,11 @@
   * 使用缓存机制提高响应速度
 
 # 项目规范
+
+## 文件编码规范
+1. 所有文件必须使用 UTF-8 编码
+2. 在编辑包含中文的文件时，如果是部分替换，必须进行编码检查
+
 ## 导入规范
 1. 使用绝对导入路径而不是相对导入
    - ✅ from backend.models.article import ArticleRequest
@@ -84,119 +83,30 @@
 4. 禁止使用 `import *`
 5. 禁止循环导入
 
-## Python 编码规范
-1. 变量命名
-   ```python
-   # ✅ 正确的命名
-   user_name = "John"
-   article_count = 42
-   is_valid = True
-   
-   # ❌ 错误的命名
-   userName = "John"  # 驼峰命名
-   a = 42            # 不明确的名称
-   flag = True       # 不明确的布尔值名称
-   ```
-
-2. 函数命名和文档字符串
-   ```python
-   def calculate_average(numbers: List[float]) -> float:
-       """
-       计算数字列表的平均值
-       
-       Args:
-           numbers: 要计算平均值的数字列表
-           
-       Returns:
-           float: 计算得到的平均值
-           
-       Raises:
-           ValueError: 当列表为空时抛出
-       """
-       if not numbers:
-           raise ValueError("数字列表不能为空")
-       return sum(numbers) / len(numbers)
-   ```
-
-3. 类定义
-   ```python
-   class ArticleGenerator:
-       """
-       文章生成器类
-       
-       属性:
-           api_client: API客户端实例
-           cache: 缓存管理器实例
-           
-       方法:
-           generate: 生成新文章
-           save: 保存文章到文件
-       """
-       
-       def __init__(self):
-           self.api_client = APIClient()
-           self.cache = Cache()
-   ```
-
-4. 类型注解
-   ```python
-   from typing import Optional, List, Dict, Any
-   
-   def process_data(
-       data: Dict[str, Any],
-       options: Optional[List[str]] = None
-   ) -> List[str]:
-       """处理数据并返回结果列表"""
-       pass
-   ```
-
-## 项目结构规范
-1. 文件命名
-   - 模块文件：小写字母，下划线分隔（article_generator.py）
-   - 测试文件：test_前缀（test_article_generator.py）
-   - 配置文件：小写字母（config.py, .env）
-
-## 错误处理规范
-1. 异常处理
-   ```python
-   try:
-       result = await api_client.call()
-   except APIError as e:
-       logger.error(f"API调用失败: {str(e)}")
-       raise HTTPException(status_code=500, detail="服务暂时不可用")
-   except ValueError as e:
-       logger.warning(f"参数验证失败: {str(e)}")
-       raise HTTPException(status_code=400, detail=str(e))
-   ```
-
-2. 自定义异常
-   ```python
-   class ArticleGenerationError(Exception):
-       """文章生成过程中的错误"""
-       pass
-   ```
-
 ## 日志规范
-1. 日志级别使用
+### 代码日志管理：
+- 使用logging库进行日志管理，日志级别为INFO
+- 日志文件名称为当前日期，如20241220.log，保存到logs目录下
+- 日志格式为：[时间] [日志级别] [模块名] [函数名] [行号] [日志内容]
+- 日志内容应包括：用户需求、用户反馈、代码执行情况、错误信息等
+
+### 日志级别使用
    ```python
    # DEBUG: 详细的调试信息
    logger.debug("API响应详情: %s", response)
-   
    # INFO: 正常的操作信息
    logger.info("开始生成文章: %s", article_id)
-   
    # WARNING: 警告信息
    logger.warning("API响应延迟超过阈值: %ds", delay)
-   
    # ERROR: 错误信息
    logger.error("文章生成失败: %s", str(error))
    ```
 
-2. 日志格式
+### 日志格式
    ```python
    # ✅ 好的日志消息
    logger.info("用户 %s 请求生成文章，主题: %s", user_id, topic)
-   
+
    # ❌ 不好的日志消息
    logger.info("生成失败")  # 信息不足
    ```

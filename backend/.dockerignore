@@ -1,0 +1,49 @@
+# 这个文件定义了构建后端Docker镜像时要排除的文件和目录
+# .dockerignore 的作用：
+# 只在构建镜像时（docker build）生效
+# 影响 COPY 命令的文件复制
+
+
+# Git相关文件
+.git
+.gitignore
+
+# Python相关文件
+__pycache__/          # Python编译缓存
+*.py[cod]            # Python编译文件
+*$py.class           # Python编译文件
+*.so                 # C扩展库
+.Python              # Python环境标记
+env/                 # 虚拟环境
+venv/                # 虚拟环境
+.venv/               # 虚拟环境
+.env                 # 环境变量文件（敏感信息）
+
+# 测试和构建文件
+.pytest_cache/       # pytest缓存
+.coverage            # 测试覆盖率数据
+htmlcov/             # 覆盖率报告
+.tox/                # tox测试环境
+build/               # 构建目录
+dist/                # 分发目录
+*.egg-info/          # 包元数据
+*.egg                # Python eggs
+
+# IDE和编辑器
+.idea/               # PyCharm
+.vscode/            # VS Code
+*.swp               # Vim
+*.swo               # Vim
+.DS_Store           # macOS
+
+# 项目特定
+logs/                # 日志目录（运行时挂载）
+output/              # 输出目录（运行时挂载）
+frontend/            # 前端代码（不需要）
+node_modules/        # Node.js依赖（不需要）
+
+# 文档和配置
+*.md                 # Markdown文档
+!README.md           # 保留README
+docker/              # Docker配置
+docker-compose*.yml  # Docker Compose配置 
