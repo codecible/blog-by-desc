@@ -12,7 +12,6 @@ logs/
 output/
 *.log
 backend/.env
-backend/.env.*
 backend/!.env.example
 node_modules/
 
