@@ -1,28 +1,21 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional, Dict, Any
 from datetime import datetime
+import logging
 
 from ..schemas.article import ArticleRequest, ArticleResponse, ArticleData
 from ..schemas.errors import APIError
 from ..services.article_generator import ArticleGenerator
 
-# 创建路由器实例，设置URL前缀和API标签
+logger = logging.getLogger(__name__)
+
+# 创建路由器实例
 router = APIRouter(
-    prefix="/blog",  # URL前缀，所有路由都会加上/blog
-    tags=["文章生成"],  # Swagger UI中的分组标签
-    responses={  # 默认的错误响应
-        404: {"model": APIError, "description": "Not found"},  # 资源未找到
-        500: {"model": APIError, "description": "Internal server error"}  # 服务器错误
-    }
+    tags=["文章生成"]
 )
 
-@router.post(
-    "/generate",  # 路由路径：/blog/generate
-    response_model=ArticleResponse,  # 响应数据模型
-    summary="生成文章",  # API简要说明
-    description="根据提供的描述和核心主题生成文章"  # API详细说明
-)
-async def generate_article(request: ArticleRequest) -> ArticleResponse:
+@router.post("/generate")
+async def generate_article(request: ArticleRequest):
     """
     生成文章的API接口
     
@@ -51,6 +44,7 @@ async def generate_article(request: ArticleRequest) -> ArticleResponse:
         HTTPException: 
             - 500: 生成文章过程中发生错误
     """
+    logger.info(f"Received generate request: {request}")
     # 创建文章生成器实例
     generator = ArticleGenerator()
     
@@ -61,7 +55,7 @@ async def generate_article(request: ArticleRequest) -> ArticleResponse:
             request.core_idea
         )
         
-        # 生成标题
+        # 生成标��
         title = await generator.generate_title(directions)
         
         # 生成内容
@@ -87,6 +81,7 @@ async def generate_article(request: ArticleRequest) -> ArticleResponse:
         )
         
     except Exception as e:
+        logger.error(f"Error generating article: {e}")
         # 捕获所有异常并转换为HTTP 500错误
         raise HTTPException(
             status_code=500,

@@ -53,12 +53,13 @@ const generateArticle = async () => {
     loading.value = true
     errorMessage.value = ''
     
-    console.log('发送请求数据:', {
+    console.log('Sending request to:', `${import.meta.env.VITE_API_URL}/blog/generate`);
+    console.log('Request data:', {
       description: formData.description,
       core_idea: formData.coreTopic,
-    })
+    });
 
-    const response = await fetch('/blog/generate', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/blog/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,16 +68,12 @@ const generateArticle = async () => {
         description: formData.description,
         core_idea: formData.coreTopic,
       }),
-    })
+    });
+
+    console.log('Response status:', response.status);
 
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error('请求失败:', {
-        status: response.status,
-        statusText: response.statusText,
-        errorText
-      })
-      throw new Error(errorText || `请求失败: ${response.status} ${response.statusText}`)
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json()
@@ -90,7 +87,7 @@ const generateArticle = async () => {
     articleData.value = data
     showPreview.value = true
   } catch (error) {
-    console.error('发生错误:', error)
+    console.error('Error:', error);
     errorMessage.value = error.message || '生成失败，请重试'
     ElMessage.error({
       message: errorMessage.value,
