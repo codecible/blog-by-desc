@@ -3,7 +3,7 @@ HOST=0.0.0.0
 PORT=3001
 
 # Monica AI API配置
-MONICA_API_KEY=your_api_key_here
+MONICA_API_KEY="sk-kF1BeZn4GEqSeeQnKj_0AFyeHzpi0vY-O_xwPU_xFqcSZYOAmSC9molrKg_TgkKwAwJ3akU0A74V2lDAPCWEfzrrcaHX"
 API_ENDPOINT=https://openapi.monica.im/v1
 AI_MODEL=gpt-4o-mini
 API_TEMPERATURE=0.7

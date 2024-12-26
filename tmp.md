@@ -1,13 +1,15 @@
- curl -X POST \
-  http://127.0.0.1:3001/blog/generate \
-  -H "Content-Type: application/json" \
-  -d '{"description":"1234132412341234","core_idea":"2341234"}'
+# 1. 首先停止所有容器
+docker-compose down
 
+# 2. 删除网络
+docker network rm blog-by-desc_app-network blog-by-desc_default blog-network
 
-在 Vite 的生产环境（vite preview）中，环境变量需要在构建时（build time）就被注入，而不是在运行时（runtime）加载。我们现在的配置有两个问题：
-.env.production 文件是在运行时通过 docker-compose 加载的，这对已经构建好的前端代码来说太晚了
-docker-compose.yml 中的环境变量也是在运行时加载的，同样太晚了
+# 如果某个网络删除失败（提示有容器在使用），可以先检查：
+docker network inspect blog-by-desc_app-network
+docker network inspect blog-by-desc_default
+docker network inspect blog-network
 
-
-docker-compose build frontend --no-cache
-docker-compose up -d frontend
+# 如果确实有容器还在使用，可以强制删除：
+docker network disconnect -f blog-by-desc_app-network [容器ID]
+docker network disconnect -f blog-by-desc_default [容器ID]
+docker network disconnect -f blog-network [容器ID]

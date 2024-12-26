@@ -13,6 +13,7 @@ output/
 *.log
 backend/.env.production
 node_modules/
+frontend/dist/
 
 # Cache
 cache/
