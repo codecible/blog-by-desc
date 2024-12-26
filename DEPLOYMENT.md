@@ -1,17 +1,14 @@
-# 项目框架设计文档
-
-## 架构概述
+# 部署和操作手册
 本项目采用前后端分离架构，使用 Docker 进行容器化部署，包含三个主要服务：Nginx 服务、前端构建服务和后端服务。
 
-## 技术栈
-- 前端：Vue.js + Vite
-- 后端：Python + FastAPI
-- 代理：Nginx
-- 容器化：Docker + Docker Compose
+> 部署配置说明
+- 本地开发环境：使用 `docker-compose.yml`
+- 阿里云环境：使用 `docker-compose.aliyun.yml`
+  * 使用阿里云优化版镜像
+  * 配置阿里云镜像加速
+  * 阿里云内可访问的镜像资源限制
 
-## 部署和操作手册
-
-### 1. 首次部署流程
+## 1. 首次部署流程
 ```bash
 # 1. 确保 Docker 和 Docker Compose 已安装
 
@@ -28,14 +25,7 @@ mkdir -p frontend/dist logs uploads
 
 # 5. Docker 网络配置（两种方案）
 
-## 方案1：使用 docker-compose 自动管理网络（推荐首次部署）
-# 使用 docker-compose.yml 中的配置：
-networks:
-  app-network:
-    name: blog-network
-    driver: bridge
-
-## 方案2：手动管理网络
+## 方案1：手动管理网络（推荐）
 # 如果需要手动管理网络，执行：
 docker network create blog-network
 # 然后在 docker-compose.yml 中使用：
@@ -44,13 +34,21 @@ networks:
     name: blog-network
     external: true
 
+## 方案2：使用 docker-compose 自动管理网络(不推荐)
+> 不推荐使用，因为首次部署时会自动创建。但在该网络已存在情况下，会报错
+# 使用 docker-compose.yml 中的配置：
+networks:
+  app-network:
+    name: blog-network
+    driver: bridge
+
 # 6. 启动所有服务
 docker-compose up -d --build
 ```
 
-### 2. 日常开发流程
+## 2. 日常开发流程
 
-#### 前端开发
+### 前端开发
 ```bash
 # 本地开发
 cd frontend
@@ -66,7 +64,7 @@ cd frontend
 npm run build
 ```
 
-#### 后端开发
+### 后端开发
 ```bash
 # 本地开发
 cd backend
@@ -79,15 +77,24 @@ uvicorn main:app --reload
 docker-compose up -d --build backend
 ```
 
-#### Nginx 配置更新
+### Nginx 配置更新
 ```bash
 # 修改 docker/nginx.conf 后
 docker-compose up -d --build nginx
 ```
 
-### 3. 常用运维操作
+## 3.阿里云上线
+```bash
+# 创建外部网络（如果尚未创建）
+docker network create blog-network
 
-#### 查看日志
+# 使用阿里云专用配置启动服务
+docker compose -f docker-compose.aliyun.yml up -d
+```
+
+## 4. 常用运维操作
+
+### 查看日志
 ```bash
 # 查看所有服务日志
 docker-compose logs -f
@@ -98,7 +105,7 @@ docker-compose logs -f backend
 docker-compose logs -f frontend
 ```
 
-#### 服务管理
+### 服务管理
 ```bash
 # 停止所有服务
 docker-compose down
@@ -111,7 +118,7 @@ docker-compose restart backend
 docker-compose ps
 ```
 
-#### 清理和重置
+### 清理和重置
 ```bash
 # 完全清理（包括容器、网络、卷）
 docker-compose down -v
@@ -121,9 +128,9 @@ docker-compose build --no-cache
 docker-compose up -d
 ```
 
-### 4. 故障排查指南
+## 5. 故障排查指南
 
-#### 常见问题和解决方案
+### 常见问题和解决方案
 
 1. **前端构建失败**
    - 检查 frontend/package.json 是否正确
@@ -150,7 +157,7 @@ docker-compose up -d
    docker network create blog-network
    ```
 
-### 5. 性能优化建议
+## 6. 性能优化建议
 
 1. **前端优化**
    - 启用 gzip 压缩
@@ -167,7 +174,7 @@ docker-compose up -d
    - 启用 HTTP/2
    - 优化静态文件缓存
 
-### 6. 安全建议
+## 7. 安全建议
 
 1. **配置管理**
    - 不要在代码中硬编码敏感信息
@@ -183,22 +190,6 @@ docker-compose up -d
    - 实现日志轮转
    - 记录关键操作日志
    - 定期备份日志文件
-
-### 7. 备份策略
-
-1. **数据备份**
-   ```bash
-   # 备份上传文件
-   tar -czf uploads_backup.tar.gz uploads/
-   
-   # 备份日志
-   tar -czf logs_backup.tar.gz logs/
-   ```
-
-2. **配置备份**
-   - 定期备份环境变量文件
-   - 使用版本控制管理配置文件
-   - 记录配置变更历史
 
 ## 后续优化方向
 1. 添加容器监控

@@ -9,7 +9,8 @@
 - 🎨 优化的文章展示效果
 - 📱 完善的移动端适配
 - 🚀 更流畅的用户体验
-- 🔒 Docker-compose部署
+- 🔒 支持Docker Compose快速部署
+- 🌩️ 支持阿里云环境部署
 
 ## 功能特点
 
@@ -27,17 +28,13 @@
 - 🔄 支持返回编辑功能
 
 ## 技术栈
-- 前端：Vue 3 + Vite + Element Plus + Pinia
-- 后端：Python FastAPI
-- 开发工具：VSCode
-- 包管理：npm(前端)、pip(后端)
-- 容器化：Docker Compose
+- 前端：Vue.js + Vite
+- 后端：Python + FastAPI
+- 代理：Nginx
+- 容器化：Docker + Docker Compose
 
-## 快速开始
-参考 项目架构文档[frame.md](frame.md)
-
-## 快速开始
-参考 项目架构文档[frame.md](frame.md)
+## 部署说明
+参见[DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## 项目结构
 
@@ -83,7 +80,16 @@ blog-by-desc/
 ├── output/                 # 生成的文章输出目录
 ├── logs/                   # 日志输出目录
 ├── docker/                 # Docker相关配置
-└── .gitignore             # Git忽略文件
+│   ├── backend.Dockerfile           # 后端服务Dockerfile
+│   ├── backend_aliyun.Dockerfile    # 阿里云专用后端Dockerfile
+│   ├── frontend.Dockerfile          # 前端服务Dockerfile
+│   ├── frontend_aliyun.Dockerfile   # 阿里云专用前端Dockerfile
+│   ├── nginx.Dockerfile             # Nginx服务Dockerfile
+│   ├── nginx_aliyun.Dockerfile      # 阿里云专用Nginx Dockerfile
+│   └── nginx.conf                   # Nginx配置文件
+├── docker-compose.yml              # 本地开发环境配置
+├── docker-compose.aliyun.yml       # 阿里云环境专用配置
+└── .gitignore                     # Git忽略文件
 ```
 
 ### 目录功能详细描述
@@ -115,15 +121,6 @@ blog-by-desc/
 2. 调用外部API服务
 3. 处理数据转换
 4. 实现缓存机制
-
-
-
-
-### 日志配置
-```python
-LOG_LEVEL = "INFO"         # 日志级别
-LOG_FORMAT = "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s"  # 日志格式
-```
 
 ## 输出说明
 

@@ -8,6 +8,27 @@
 
 ## Unreleased
 
+## [1.0.0] - 2024-12-26
+### Added
+- 部署上云
+- 新增阿里云专用 Dockerfile
+  * 添加 `backend_aliyun.Dockerfile` 使用阿里云镜像源
+  * 添加 `frontend_aliyun.Dockerfile` 使用阿里云 Node 镜像
+  * 添加 `nginx_aliyun.Dockerfile` 使用阿里云优化版 Nginx
+  * 添加 `docker-compose.aliyun.yml` 用于阿里云环境部署
+- 优化阿里云部署配置
+  * 使用阿里云镜像仓库加速构建
+  * 配置 npm 和 pip 使用阿里云镜像源
+  * 优化容器资源限制配置
+  * 完善日志管理配置
+
+### Changed
+- 调整构建配置适配阿里云环境
+  * 更新包管理器从 apt 到 yum
+  * 优化用户创建命令适配阿里云基础镜像
+  * 调整文件权限和目录结构
+  * 优化健康检查配置
+
 ## [0.3.0] - 2024-12-24
 ### Added
 - Docker部署优化
