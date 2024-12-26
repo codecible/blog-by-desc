@@ -30,7 +30,8 @@ services:
       context: .
       dockerfile: docker/frontend.Dockerfile
     volumes:
-      - ./frontend/dist:/app/dist
+      - ./frontend/dist:/app/dist:rw  # 添加 rw 权限
+
     command: ["npm", "run", "build"]
     deploy:
       resources:
