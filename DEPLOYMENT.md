@@ -100,10 +100,10 @@ docker compose -f docker compose.aliyun.yml up -d
 docker compose logs -f
 
 # 查看特定服务日志
-docker compose logs -f nginx
+docker compose logs -f nginx-
 docker compose logs -f backend
 docker compose logs -f frontend
-```
+```t
 
 ### 服务管理
 ```bash
