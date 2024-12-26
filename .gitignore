@@ -11,8 +11,7 @@
 logs/
 output/
 *.log
-backend/.env
-backend/!.env.example
+backend/.env.production
 node_modules/
 
 # Cache

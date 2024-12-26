@@ -53,6 +53,14 @@ const generateArticle = async () => {
     loading.value = true
     errorMessage.value = ''
     
+    // 添加环境变量调试日志
+    console.log('Environment variables:', {
+      VITE_API_URL: import.meta.env.VITE_API_URL,
+      MODE: import.meta.env.MODE,
+      DEV: import.meta.env.DEV,
+      PROD: import.meta.env.PROD,
+    });
+    
     console.log('Sending request to:', `${import.meta.env.VITE_API_URL}/blog/generate`);
     console.log('Request data:', {
       description: formData.description,

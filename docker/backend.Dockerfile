@@ -1,8 +1,5 @@
-# 构建参数
-ARG PYTHON_VERSION=3.11.7
-
 # 构建阶段
-FROM python:${PYTHON_VERSION} AS builder
+FROM python:3.11.7-slim AS builder
 
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1 \
@@ -10,7 +7,7 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_DEFAULT_TIMEOUT=100 \
-    DEBIAN_FRONTEND=noninteractive
+    POETRY_VERSION=1.7.1
 
 # 设置pip镜像源
 ENV PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/ \
@@ -33,10 +30,15 @@ COPY requirements.txt .
 # 创建虚拟环境并安装依赖
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
+
+# 设置pip镜像源
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ \
+    && pip config set global.trusted-host mirrors.aliyun.com
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 运行阶段
-FROM python:${PYTHON_VERSION}
+FROM python:3.11.7-slim
 
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1 \
@@ -86,7 +88,7 @@ EXPOSE 3001
 WORKDIR /app/backend
 
 # 启动命令
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3001", "--reload"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3001", "--workers", "4"]
 
 # 容器内目录结构
 # /app/
@@ -97,3 +99,6 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3001", "--reload"]
 # │   └── services/
 # ├── logs/            # 日志目录
 # └── uploads/         # 上传文件目录
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3001/health || exit 1

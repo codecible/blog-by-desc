@@ -1,38 +1,33 @@
 services:
-  frontend:
-    build: 
+  nginx:
+    build:
       context: .
-      dockerfile: docker/frontend.Dockerfile
-    # 端口映射配置，将容器内部的端口映射到主机上，让外部能够访问容器的配置
-    # 格式是 "主机端口:容器端口"
+      dockerfile: docker/nginx.Dockerfile
     ports:
-      - "3000:3000"
-    env_file:
-      - frontend/.env.production
+      - "80:80"
     depends_on:
       backend:
         condition: service_healthy
-    restart: unless-stopped
     networks:
       - app-network
+    restart: unless-stopped
     deploy:
       resources:
         limits:
           cpus: '0.5'
           memory: 500M
-    # 环境变量配置
-    # VITE_API_URL: 前端应用访问后端API的基础URL
-    # 设置为/api是因为我们在Nginx配置中将所有/api开头的请求代理到后端服务
-    # 这样可以避免跨域问题，并且在Docker网络中实现前后端通信
-    environment:
-      - VITE_API_URL=/api
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   backend:
     build:
       context: .
       dockerfile: docker/backend.Dockerfile
-    ports:
-      - "3001:3001"
+    expose:
+      - "3001"
     env_file:
       - backend/.env.production
     volumes:
@@ -40,11 +35,6 @@ services:
       - ./uploads:/app/uploads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
-      # 健康检查配置参数说明:
-      # interval: 每30秒执行一次健康检查
-      # timeout: 健康检查命令执行超时时间为10秒
-      # retries: 连续3次检查失败则判定为不健康
-      # start_period: 容器启动后等待10秒再开始执行健康检查
       interval: 30s
       timeout: 10s
       retries: 2
@@ -63,11 +53,15 @@ services:
       uvicorn main:app 
       --host 0.0.0.0 
       --port 3001 
-      --reload
+      --workers 4
       --log-level info
-      --access-log
     environment:
       - PYTHONUNBUFFERED=1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
   app-network:

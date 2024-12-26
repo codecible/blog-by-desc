@@ -3,6 +3,9 @@ FROM node:18.19.0 AS builder
 
 WORKDIR /app
 
+# 设置构建时环境变量
+ENV VITE_API_URL=http://backend:3001
+
 # 设置npm配置
 RUN npm config set registry https://registry.npmmirror.com && \
     npm config set fetch-retries 5 && \
