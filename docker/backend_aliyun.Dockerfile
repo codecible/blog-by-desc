@@ -16,13 +16,9 @@ ENV PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/ \
 WORKDIR /app
 
 # 安装构建依赖
-RUN echo "deb https://mirrors.aliyun.com/debian/ bullseye main non-free contrib" > /etc/apt/sources.list && \
-    echo "deb https://mirrors.aliyun.com/debian-security bullseye-security main" >> /etc/apt/sources.list && \
-    echo "deb https://mirrors.aliyun.com/debian/ bullseye-updates main non-free contrib" >> /etc/apt/sources.list && \
-    apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN yum install -y gcc gcc-c++ make curl \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 # 复制依赖文件
 COPY requirements.txt .
@@ -55,17 +51,13 @@ WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 
 # 安装运行时依赖
-RUN echo "deb https://mirrors.aliyun.com/debian/ bullseye main non-free contrib" > /etc/apt/sources.list && \
-    echo "deb https://mirrors.aliyun.com/debian-security bullseye-security main" >> /etc/apt/sources.list && \
-    echo "deb https://mirrors.aliyun.com/debian/ bullseye-updates main non-free contrib" >> /etc/apt/sources.list && \
-    apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+RUN yum install -y curl ca-certificates \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 # 创建非root用户
-RUN addgroup --system --gid 1000 appgroup && \
-    adduser --system --uid 1000 --ingroup appgroup --shell /bin/sh appuser
+RUN groupadd -r -g 1000 appgroup && \
+    useradd -r -u 1000 -g appgroup -s /bin/bash appuser
 
 # 创建必要的目录
 RUN mkdir -p logs uploads backend
