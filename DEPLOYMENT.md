@@ -89,7 +89,7 @@ docker compose up -d --build nginx
 docker network create blog-network
 
 # 使用阿里云专用配置启动服务
-docker compose -f docker compose.aliyun.yml up -d
+docker compose -f docker-compose.aliyun.yml up -d
 ```
 
 ## 4. 常用运维操作

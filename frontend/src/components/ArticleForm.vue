@@ -67,33 +67,88 @@ const generateArticle = async () => {
       core_idea: formData.coreTopic,
     });
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/blog/generate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        description: formData.description,
-        core_idea: formData.coreTopic,
-      }),
-    });
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+        throw new Error('请求超时，请重试');
+      }, 300000); // 5分钟超时
 
-    console.log('Response status:', response.status);
+      // 更新加载状态文字
+      const loadingText = ref('正在生成文章');
+      const loadingInterval = setInterval(() => {
+        loadingText.value = loadingText.value + '.';
+        if (loadingText.value.endsWith('....')) {
+          loadingText.value = '正在生成文章';
+        }
+      }, 500);
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      try {
+        const response = await Promise.race([
+          fetch(`${import.meta.env.VITE_API_URL}/blog/generate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              description: formData.description,
+              core_idea: formData.coreTopic,
+            }),
+            signal: controller.signal,
+          }),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('请求超时，请重试')), 300000)
+          )
+        ]);
+
+        clearTimeout(timeoutId);
+        clearInterval(loadingInterval);
+
+        if (!response) {
+          throw new Error('未收到服务器响应');
+        }
+
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => '未知错误');
+          console.error('Error response:', errorText);
+          throw new Error(`请求失败: ${response.status} ${errorText}`);
+        }
+
+        let data;
+        try {
+          data = await response.json();
+          console.log('收到响应数据:', data);
+        } catch (e) {
+          console.error('JSON解析错误:', e);
+          throw new Error('响应数据格式错误');
+        }
+
+        if (!data || !data.success) {
+          throw new Error(data?.message || '生成失败，请重试');
+        }
+
+        // 保存文章数据并显示预览
+        articleData.value = data;
+        showPreview.value = true;
+
+      } catch (error) {
+        clearInterval(loadingInterval);
+        throw error;
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+      errorMessage.value = error.message || '生成失败，请重试';
+      ElMessage.error({
+        message: errorMessage.value,
+        duration: 5000,
+        showClose: true
+      });
+    } finally {
+      loading.value = false;
     }
-
-    const data = await response.json()
-    console.log('收到响应数据:', data)
-    
-    if (!data.success) {
-      throw new Error(data.message || '生成失败，请重试')
-    }
-    
-    // 保存文章数据并显示预览
-    articleData.value = data
-    showPreview.value = true
   } catch (error) {
     console.error('Error:', error);
     errorMessage.value = error.message || '生成失败，请重试'
@@ -102,8 +157,6 @@ const generateArticle = async () => {
       duration: 5000,
       showClose: true
     })
-  } finally {
-    loading.value = false
   }
 }
 
@@ -191,7 +244,7 @@ const resetForm = () => {
               @click="generateArticle"
               class="submit-button"
             >
-              {{ loading ? '正在生成文章...' : '点击自动生成文章' }}
+              {{ loading ? loadingText : '点击自动生成文章' }}
             </el-button>
             
             <el-button

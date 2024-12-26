@@ -11,12 +11,18 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://backend:3001',
+        target: 'http://127.0.0.1:3001',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy, options) => {
           proxy.on('error', (err, req, res) => {
             console.error('proxy error', err);
+            if (!res.headersSent && res.writeHead) {
+              res.writeHead(500, {
+                'Content-Type': 'application/json'
+              });
+              res.end(JSON.stringify({ error: 'Proxy error', details: err.message }));
+            }
           });
           proxy.on('proxyReq', (proxyReq, req, res) => {
             console.log('Sending Request to the Target:', req.method, req.url);
@@ -25,9 +31,10 @@ export default defineConfig({
             console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
           });
         },
-        timeout: 5000,
+        timeout: 300000,
         secure: false,
-        ws: true
+        ws: true,
+        proxyTimeout: 300000,
       }
     }
   },
@@ -74,7 +81,7 @@ export default defineConfig({
             }
           }
         },
-        // 配置chunk文件名格式
+        // 配��chunk文件名格式
         chunkFileNames: 'assets/js/[name]-[hash].js',
         // 配置入口文件名格式
         entryFileNames: 'assets/js/[name]-[hash].js',

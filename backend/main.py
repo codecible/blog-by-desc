@@ -5,7 +5,10 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import datetime
 
-from backend.routers import article
+try:
+    from backend.routers import article  # Docker 环境
+except ImportError:
+    from routers import article  # 本地开发环境
 
 # 配置日志格式
 logging.basicConfig(
