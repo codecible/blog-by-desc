@@ -2,8 +2,8 @@
 本项目采用前后端分离架构，使用 Docker 进行容器化部署，包含三个主要服务：Nginx 服务、前端构建服务和后端服务。
 
 > 部署配置说明
-- 本地开发环境：使用 `docker-compose.yml`
-- 阿里云环境：使用 `docker-compose.aliyun.yml`
+- 本地开发环境：使用 `docker compose.yml`
+- 阿里云环境：使用 `docker compose.aliyun.yml`
   * 使用阿里云优化版镜像
   * 配置阿里云镜像加速
   * 阿里云内可访问的镜像资源限制
@@ -28,22 +28,22 @@ mkdir -p frontend/dist logs uploads
 ## 方案1：手动管理网络（推荐）
 # 如果需要手动管理网络，执行：
 docker network create blog-network
-# 然后在 docker-compose.yml 中使用：
+# 然后在 docker compose.yml 中使用：
 networks:
   app-network:
     name: blog-network
     external: true
 
-## 方案2：使用 docker-compose 自动管理网络(不推荐)
+## 方案2：使用 docker compose 自动管理网络(不推荐)
 > 不推荐使用，因为首次部署时会自动创建。但在该网络已存在情况下，会报错
-# 使用 docker-compose.yml 中的配置：
+# 使用 docker compose.yml 中的配置：
 networks:
   app-network:
     name: blog-network
     driver: bridge
 
 # 6. 启动所有服务
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ## 2. 日常开发流程
@@ -57,7 +57,7 @@ npm run dev
 
 # 部署更新
 # 方法1：使用 Docker（推荐）
-docker-compose up --build frontend
+docker compose up --build frontend
 
 # 方法2：本地构建
 cd frontend
@@ -74,13 +74,13 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 
 # 部署更新
-docker-compose up -d --build backend
+docker compose up -d --build backend
 ```
 
 ### Nginx 配置更新
 ```bash
 # 修改 docker/nginx.conf 后
-docker-compose up -d --build nginx
+docker compose up -d --build nginx
 ```
 
 ## 3.阿里云上线
@@ -89,7 +89,7 @@ docker-compose up -d --build nginx
 docker network create blog-network
 
 # 使用阿里云专用配置启动服务
-docker compose -f docker-compose.aliyun.yml up -d
+docker compose -f docker compose.aliyun.yml up -d
 ```
 
 ## 4. 常用运维操作
@@ -97,35 +97,35 @@ docker compose -f docker-compose.aliyun.yml up -d
 ### 查看日志
 ```bash
 # 查看所有服务日志
-docker-compose logs -f
+docker compose logs -f
 
 # 查看特定服务日志
-docker-compose logs -f nginx
-docker-compose logs -f backend
-docker-compose logs -f frontend
+docker compose logs -f nginx
+docker compose logs -f backend
+docker compose logs -f frontend
 ```
 
 ### 服务管理
 ```bash
 # 停止所有服务
-docker-compose down
+docker compose down
 
 # 重启特定服务
-docker-compose restart nginx
-docker-compose restart backend
+docker compose restart nginx
+docker compose restart backend
 
 # 查看服务状态
-docker-compose ps
+docker compose ps
 ```
 
 ### 清理和重置
 ```bash
 # 完全清理（包括容器、网络、卷）
-docker-compose down -v
+docker compose down -v
 
 # 重新构建所有服务
-docker-compose build --no-cache
-docker-compose up -d
+docker compose build --no-cache
+docker compose up -d
 ```
 
 ## 5. 故障排查指南
@@ -135,12 +135,12 @@ docker-compose up -d
 1. **前端构建失败**
    - 检查 frontend/package.json 是否正确
    - 检查 node_modules 是否完整
-   - 查看构建日志：`docker-compose logs frontend`
+   - 查看构建日志：`docker compose logs frontend`
 
 2. **后端服务无法启动**
    - 检查环境变量配置
    - 检查端口占用情况
-   - 查看日志：`docker-compose logs backend`
+   - 查看日志：`docker compose logs backend`
 
 3. **Nginx 403 错误**
    - 检查目录权限

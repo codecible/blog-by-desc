@@ -36,8 +36,14 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 500M
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          memory: 1G
+    environment:
+      # 设置Node.js的内存限制为1.5GB,防止构建时内存溢出
+      # 这个设置会覆盖Node.js默认的内存限制(约1GB)
+      - NODE_OPTIONS="--max-old-space-size=1536"
     logging:
       driver: "json-file"
       options:
