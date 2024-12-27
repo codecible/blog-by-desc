@@ -45,14 +45,26 @@ export default defineConfig({
     
     // CSS 代码分割
     cssCodeSplit: true,
+
+    // 确保正确的模块加载顺序
+    modulePreload: {
+      polyfill: true
+    },
     
     // 配置 Rollup 打包选项
     rollupOptions: {
       output: {
         // 手动配置代码分割
-        manualChunks: {
-          'vue-vendor': ['vue', '@vue/runtime-core', '@vue/runtime-dom', '@vue/reactivity'],
-          'element-vendor': ['element-plus']
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('vue') || id.includes('@vue')) {
+              return 'vendor-vue'
+            }
+            if (id.includes('element-plus')) {
+              return 'vendor-element'
+            }
+            return 'vendor-others'
+          }
         }
       }
     },
