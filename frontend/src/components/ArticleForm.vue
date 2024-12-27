@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import ArticlePreview from './ArticlePreview.vue'
 
@@ -9,7 +9,9 @@ const formData = reactive({
   coreTopic: ''
 })
 
+const loading = ref(false)
 const loadingText = ref('正在生成文章')
+const buttonText = computed(() => loading.value ? loadingText.value : '点击自动生成文章')
 
 // 表单验证规则
 const rules = reactive({
@@ -34,7 +36,6 @@ const rules = reactive({
 })
 
 const formRef = ref(null)
-const loading = ref(false)
 const showPreview = ref(false)
 const articleData = ref(null)
 const errorMessage = ref('')
@@ -229,7 +230,7 @@ const resetForm = () => {
               @click="generateArticle"
               class="submit-button"
             >
-              {{ loading ? loadingText : '点击自动生成文章' }}
+              {{ buttonText }}
             </el-button>
             
             <el-button
