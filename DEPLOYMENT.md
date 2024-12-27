@@ -71,7 +71,12 @@ cd backend
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+#开启热重载
 uvicorn main:app --reload
+# 指定主机和端口
+# uvicorn main:app --host 0.0.0.0 --port 8000
+# 请求 -> Uvicorn -> FastAPI -> 响应
+ 
 
 # 部署更新
 docker compose up -d --build backend

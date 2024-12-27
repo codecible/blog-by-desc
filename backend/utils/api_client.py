@@ -59,14 +59,15 @@ class APIClient:
         从环境变量中获取API密钥，如果未设置则抛出异常
         """
         self.config = Config()
-        api_key = os.getenv('MONICA_API_KEY')
-        if not api_key:
-            raise ValueError("未设置MONICA_API_KEY环境变量")
+        
+        # 确保使用Monica AI
+        if self.config.AI_PROVIDER != "monica":
+            raise ValueError("APIClient只支持Monica AI，当前配置的AI提供商为: " + self.config.AI_PROVIDER)
             
         # 初始化异步OpenAI客户端
         self.client = AsyncOpenAI(
-            base_url=self.config.API_ENDPOINT,
-            api_key=api_key
+            base_url=self.config.MONICA_API_ENDPOINT,
+            api_key=self.config.MONICA_API_KEY
         )
             
     async def call_api(
@@ -131,7 +132,7 @@ class APIClient:
             
             # 创建完成请求
             completion = await self.client.chat.completions.create(
-                model=self.config.AI_MODEL,
+                model=self.config.MONICA_MODEL,
                 messages=messages,
                 temperature=kwargs.get('temperature', self.config.API_TEMPERATURE),
                 max_tokens=kwargs.get('max_tokens', self.config.API_MAX_TOKENS)
