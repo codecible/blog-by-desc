@@ -40,47 +40,21 @@ export default defineConfig({
   },
 
   build: {
-    // 启用源码映射用于生产环境调试
-    sourcemap: true,
+    // 禁用源码映射
+    sourcemap: false,
     
-    // CSS 代码分割
-    cssCodeSplit: true,
-
-    // 确保正确的模块加载顺序
-    modulePreload: {
-      polyfill: true
-    },
+    // 禁用代码分割
+    cssCodeSplit: false,
     
     // 配置 Rollup 打包选项
     rollupOptions: {
       output: {
-        // 手动配置代码分割
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('vue') || id.includes('@vue')) {
-              return 'vendor-vue'
-            }
-            if (id.includes('element-plus')) {
-              return 'vendor-element'
-            }
-            return 'vendor-others'
-          }
-        }
+        // 禁用代码分割，将所有代码打包到一起
+        manualChunks: undefined
       }
     },
     
-    // 配置chunk大小警告限制
-    chunkSizeWarningLimit: 800,
-    
-    // 压缩配置
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        // 生产环境移除console
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log']
-      }
-    }
+    // 禁用压缩
+    minify: false
   }
 })
