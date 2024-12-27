@@ -1,14 +1,38 @@
 import os
 import json
 import logging
+import sys
+from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import datetime
+from dotenv import load_dotenv
 
-try:
-    from backend.routers import article  # Docker 环境
-except ImportError:
-    from routers import article  # 本地开发环境
+# 加载环境变量
+def load_env_file():
+    """加载环境变量文件，按优先级从高到低尝试加载"""
+    current_dir = Path(__file__).resolve().parent
+    env_files = [
+        current_dir / '.env',                    # 本地开发环境
+        current_dir / '.env.production',         # 生产环境
+        current_dir / '.env.example'             # 示例配置（最低优先级）
+    ]
+    
+    for env_file in env_files:
+        if env_file.exists():
+            load_dotenv(env_file)
+            print(f"已加载环境变量文件: {env_file}")
+            return
+    print("警告：未找到任何环境变量文件")
+
+load_env_file()
+
+# 设置 Python 路径
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.append(str(BACKEND_DIR))
+
+from backend.routers import article
 
 # 配置日志格式
 logging.basicConfig(
@@ -61,7 +85,7 @@ app = FastAPI(
     ]
 )
 
-# 从环境变量获取CORS配置
+# 环境变量获取CORS配置
 try:
     # 尝试解析JSON格式的允许源列表
     allowed_origins = json.loads(os.getenv("ALLOWED_ORIGINS", "[]"))

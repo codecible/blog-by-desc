@@ -33,13 +33,17 @@ class ArticleGenerator:
         config: 配置对象，包含文章生成的相关配置
     """
     
-    def __init__(self, model_type: str = "monica"):
+    def __init__(self, model_type: Optional[str] = None):
         """
         初始化文章生成器
         
         Args:
-            model_type: AI提供商类型，默认为"monica"
+            model_type: AI提供商类型，如果不指定则使用配置文件中的设置
         """
+        # 如果未指定model_type，从配置中获取
+        if model_type is None:
+            config = Config.get_instance()
+            model_type = config.AI_PROVIDER
 
         self.api_client = APIClient(model_type)
         self.cache = Cache()

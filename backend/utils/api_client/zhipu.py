@@ -27,7 +27,7 @@ class ZhipuAPIClient(BaseAPIClient):
         
         # 初始化智谱AI客户端
         zhipuai.api_key = self.config.ZHIPU_API_KEY
-        self.client = zhipuai
+        self.client = zhipuai.ZhipuAI(api_key=self.config.ZHIPU_API_KEY)
         logger.info(f"初始化智谱AI客户端成功，使用模型: {self.config.ZHIPU_MODEL}")
         
     def _convert_message(self, message: Message) -> Dict:
@@ -93,23 +93,18 @@ class ZhipuAPIClient(BaseAPIClient):
             converted_messages = [self._convert_message(msg) for msg in messages]
             
             # 创建完成请求
-            response = self.client.model_api.sse_invoke(
+            response = self.client.chat.completions.create(
                 model=self.config.ZHIPU_MODEL,
-                prompt=converted_messages,
+                messages=converted_messages,
                 temperature=kwargs.get('temperature', self.config.API_TEMPERATURE),
                 top_p=kwargs.get('top_p', 0.7),
-                request_id=None,  # 由智谱AI自动生成
-                incremental=False  # 非增量返回
+                stream=False  # 非流式返回
             )
             
-            # 检查响应状态
-            if response.code != 200:
-                logger.error(f"智谱AI API调用失败: 状态码={response.code}, 错误信息={response.msg}")
-                raise ValueError(f"智谱AI API调用失败: {response.msg}")
-            
-            logger.info(f"智谱AI API调用成功: 生成内容长度={len(response.data.choices[0].content)}")
-            # 返回生成的文本内容
-            return response.data.choices[0].content
+            # 获取生成的内容
+            content = response.choices[0].message.content
+            logger.info(f"智谱AI API调用成功: 生成内容长度={len(content)}")
+            return content
             
         except Exception as e:
             logger.error(f"智谱AI API调用出错: {str(e)}")

@@ -10,11 +10,19 @@
 # Project specific
 logs/
 output/
-*.log
-backend/.env.production
-node_modules/
 frontend/dist/
+frontend/node_modules/
+backend/.env.production
 backend/venv/
+backend/.env
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Cache
 cache/

@@ -78,12 +78,32 @@ cd backend
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-#开启热重载
-uvicorn main:app --reload
-# 指定主机和端口
-# uvicorn main:app --host 0.0.0.0 --port 8000
-# 请求 -> Uvicorn -> FastAPI -> 响应
- 
+
+# 开启热重载（从项目根目录运行）
+cd ..
+# 方式1：使用默认配置
+python -m uvicorn backend.main:app --reload
+# 默认配置说明：
+# - 主机: localhost (127.0.0.1)
+# - 端口: 8000 (Uvicorn的默认端口)
+# - 访问地址: http://localhost:8000
+
+# 方式2：自定义配置
+# 仅本地访问
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 3001 --reload
+
+# 允许局域网访问
+python -m uvicorn backend.main:app --host 0.0.0.0 --port 3001 --reload
+
+# 配置说明：
+# --host: 监听的网络接口
+#   - 127.0.0.1: 只允许本机访问
+#   - 0.0.0.0: 允许所有网络接口访问（包括局域网和远程访问）
+# --port: 监听的端口号（默认为8000）
+# --reload: 启用热重载，代码修改后自动重启
+# --workers: 工作进程数（默认为1）
+# --log-level: 日志级别（默认为info）
+```
 
 # 部署更新
 docker compose up -d --build backend
