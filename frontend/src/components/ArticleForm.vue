@@ -4,13 +4,18 @@ import { ElMessage } from 'element-plus'
 import ArticlePreview from './ArticlePreview.vue'
 
 // 表单数据
+const formRef = ref(null)
+const loading = ref(false)
+const loadingText = ref('正在生成文章')
+const showPreview = ref(false)
+const articleData = ref(null)
+const errorMessage = ref('')
+
 const formData = reactive({
   description: '',
   coreTopic: ''
 })
 
-const loading = ref(false)
-const loadingText = ref('正在生成文章')
 const buttonText = computed(() => loading.value ? loadingText.value : '点击自动生成文章')
 
 // 表单验证规则
@@ -34,11 +39,6 @@ const rules = reactive({
     { max: 100, message: '核心主题不能超过100个字符', trigger: 'blur' }
   ]
 })
-
-const formRef = ref(null)
-const showPreview = ref(false)
-const articleData = ref(null)
-const errorMessage = ref('')
 
 // 字数统计
 const getWordCount = (text) => {

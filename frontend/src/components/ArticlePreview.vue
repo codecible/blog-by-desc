@@ -13,6 +13,7 @@ const props = defineProps({
   }
 })
 
+// 初始化所有ref变量
 const title = ref('')
 const directions = ref([])
 const content = ref('')
