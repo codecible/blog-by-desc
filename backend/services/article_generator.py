@@ -1,3 +1,9 @@
+"""
+文章生成器模块
+
+这个模块负责文章的生成、缓存和存储。
+"""
+
 import os
 import logging
 import hashlib
@@ -7,7 +13,7 @@ from datetime import datetime
 from backend.utils.api_client import APIClient
 from backend.utils.cache import Cache
 from backend.config import Config
-from backend.schemas.article import ArticleRequest, ArticleResponse
+from backend.schemas.article import ArticleRequest, ArticleResponse, ArticleData
 
 logger = logging.getLogger(__name__)
 
@@ -27,9 +33,14 @@ class ArticleGenerator:
         config: 配置对象，包含文章生成的相关配置
     """
     
-    def __init__(self):
-        """初始化文章生成器"""
-        self.api_client = APIClient()
+    def __init__(self, model_type: str = "monica"):
+        """
+        初始化文章生成器
+        
+        Args:
+            model_type: AI提供商类型，默认为"monica"
+        """
+        self.api_client = APIClient(model_type)
         self.cache = Cache()
         self.config = Config()
         
@@ -43,7 +54,8 @@ class ArticleGenerator:
         Returns:
             str: MD5格式的缓存键
         """
-        content = ''.join(str(arg) for arg in args)
+        model_type = self.api_client.client.config.AI_PROVIDER
+        content = f"{model_type}:" + ''.join(str(arg) for arg in args)
         return hashlib.md5(content.encode()).hexdigest()
         
     async def generate_directions(
@@ -114,7 +126,7 @@ class ArticleGenerator:
         except Exception as e:
             logger.error(f"生成写作方向时发生错误: {str(e)}")
             raise
-        
+            
     async def generate_title(self, directions: List[str]) -> str:
         """
         生成文章标题
@@ -187,7 +199,7 @@ class ArticleGenerator:
         except Exception as e:
             logger.error(f"生成标题时发生错误: {str(e)}")
             raise
-        
+            
     async def generate_content(
         self, 
         directions: List[str], 
@@ -213,10 +225,10 @@ class ArticleGenerator:
                 logger.info("使用缓存的文章内容")
                 return cached_result
                 
-            min_word_count  = self.config.MIN_WORD_COUNT * 3
+            min_word_count = self.config.MIN_WORD_COUNT * 3
             max_word_count = self.config.MAX_WORD_COUNT * 3
             min_core_word_count = self.config.MIN_CORE_WORD_COUNT * 3
-
+            
             messages = [
                 {
                     "role": "system",
@@ -232,25 +244,22 @@ class ArticleGenerator:
                                 "- 结构清晰，层次分明\n"
                                 "- 语言生动，表达流畅\n"
                                 f"- 特别强调，必须要遵循的：每个主题下的数据字数不少于{min_core_word_count}个字 。写完后请注意检查是否符合标准\n"
-                                # "- 对每一个主题的字数进行统计，在主题后展示\n\n"
                                 "2. 写作技巧\n"
-                                "- 开篇要吸引读者注意\n" 
+                                "- 开篇要吸引读者注意\n"
                                 "- 善用故事化表达\n"
                                 "- 适当运用数据支撑\n"
                                 "- 结尾给出思考启发\n\n"
-                                
                                 "3. 格式规范\n"
                                 "- 使用markdown语法\n"
                                 "- 标题层级清晰(#、##、###)\n"
                                 "- 重点内容加粗(**文字**)\n"
                                 "- 适当使用列表和引用\n"
                                 "- 段落间留出适当空行\n\n"
-                                
                                 "请确保文章:\n"
                                 "1. 符合专业性要求\n"
-                                "2. 内容通俗易懂\n" 
+                                "2. 内容通俗易懂\n"
                                 "3. 观点论证充分\n"
-                                "4. 行文流畅自然"
+                                "4. 文章流畅自然"
                             )
                         }
                     ]
@@ -281,7 +290,7 @@ class ArticleGenerator:
         except Exception as e:
             logger.error(f"生成文章内容时发生错误: {str(e)}")
             raise
-        
+            
     def save_article(
         self, 
         title: str, 
@@ -322,6 +331,16 @@ class ArticleGenerator:
             logger.error(f"保存文章时发生错误: {str(e)}")
             raise
             
+    def switch_model(self, model_type: str) -> None:
+        """
+        切换AI模型类型
+        
+        Args:
+            model_type: 新的AI提供商类型
+        """
+        if model_type != self.api_client.client.config.AI_PROVIDER:
+            self.api_client = APIClient(model_type)
+            
     async def generate(self, request: ArticleRequest) -> ArticleResponse:
         """
         生成文章的主要流程
@@ -338,6 +357,9 @@ class ArticleGenerator:
         logger.info(f"开始生成文章: {request.dict()}")
         
         try:
+            # 如果需要，切换到新的模型
+            self.switch_model(request.model_type)
+            
             # 生成文章内容
             directions = await self.generate_directions(
                 request.description, 
@@ -351,10 +373,14 @@ class ArticleGenerator:
             
             # 创建响应
             response = ArticleResponse(
-                title=title,
-                content=content,
-                directions=directions,
-                file_path=file_path
+                success=True,
+                message="文章生成成功",
+                data=ArticleData(
+                    title=title,
+                    content=content,
+                    directions=directions,
+                    file_path=file_path
+                )
             )
             
             logger.info(f"文章生成成功: {file_path}")

@@ -3,9 +3,9 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 import logging
 
-from ..schemas.article import ArticleRequest, ArticleResponse, ArticleData
-from ..schemas.errors import APIError
-from ..services.article_generator import ArticleGenerator
+from backend.schemas.article import ArticleRequest, ArticleResponse, ArticleData
+from backend.schemas.errors import APIError
+from backend.services.article_generator import ArticleGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ async def generate_article(request: ArticleRequest):
             request.core_idea
         )
         
-        # 生成标��
+        # 生成标题
         title = await generator.generate_title(directions)
         
         # 生成内容

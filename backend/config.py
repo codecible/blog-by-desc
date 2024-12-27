@@ -14,6 +14,10 @@ class Config:
         # AI提供商配置
         self.AI_PROVIDER = os.getenv("AI_PROVIDER", "monica")  # 默认使用monica
         
+        # 验证AI提供商
+        if self.AI_PROVIDER not in ["monica", "zhipu"]:
+            raise ValueError(f"不支持的AI提供商: {self.AI_PROVIDER}")
+        
         # Monica AI配置
         self.MONICA_API_ENDPOINT = os.getenv("MONICA_API_ENDPOINT", "https://openapi.monica.im/v1")
         self.MONICA_API_KEY = os.getenv("MONICA_API_KEY")

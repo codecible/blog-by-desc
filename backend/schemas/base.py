@@ -14,5 +14,6 @@ class BaseResponse(BaseModel):
                 "message": "操作成功",
                 "data": {"key": "value"}
             }
-        }
+        },
+        protected_namespaces=()
     ) 
