@@ -28,11 +28,11 @@ cp backend/.env.example backend/.env.production
 # 编辑 backend/.env.production 设置必要的环境变量
 
 # 4. 创建必要的目录
-mkdir -p frontend/dist logs uploads
+mkdir -p logs/nginx && chmod -R 777 logs/nginx
 
 # 5. Docker 网络配置（两种方案）
 
-## 方案1：手动管理网络（推荐）
+## 方案1：手动管理网络（推荐&默认）
 # 如果需要手动管理网络，执行：
 docker network create blog-network
 # 然后在 docker compose.yml 中使用：
@@ -50,7 +50,7 @@ networks:
     driver: bridge
 
 # 6. 启动所有服务
-docker compose up -d --build
+docker compose -f docker-compose.pre.pre.yml up -d --build
 ```
 
 ## 2. 日常开发流程
@@ -59,7 +59,7 @@ docker compose up -d --build
 ```bash
 # 本地开发
 cd frontend
-npm install
+npm install #首次执行/或者有新的插件安装
 npm run dev
 
 # 部署更新
@@ -74,48 +74,42 @@ npm run build
 ### 后端开发
 ```bash
 # 本地开发
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+# 基于项目根目录
+python3.11 -m venv venv              # 创建新的虚拟环境
+source venv/bin/activate         # 激活虚拟环境
+pip install --upgrade pip        # 升级pip
+pip install -r requirements.txt  # 安装依赖
 
-# 开启热重载（从项目根目录运行）
-cd ..
+# 开启热重载
 # 方式1：使用默认配置
-python -m uvicorn backend.main:app --reload
 # 默认配置说明：
-# - 主机: localhost (127.0.0.1)
-# - 端口: 8000 (Uvicorn的默认端口)
-# - 访问地址: http://localhost:8000
+# --host: 监听的网络接口
+#   - 127.0.0.1: 只允许本机访问
+#   - 0.0.0.0: 允许所有网络接口访问（包括局域网和远程访问）
+# --port: 监听的端口号（默认为8000, Uvicorn的默认端口）
+# --reload: 启用热重载，代码修改后自动重启
+# --workers: 工作进程数（默认为1）
+# --log-level: 日志级别（默认为info）
+python3.11 -m uvicorn backend.main:app --reload
 
 # 方式2：自定义配置
 # 仅本地访问
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 3001 --reload
-
 # 允许局域网访问
 python -m uvicorn backend.main:app --host 0.0.0.0 --port 3001 --reload
-
-# 配置说明：
-# --host: 监听的网络接口
-#   - 127.0.0.1: 只允许本机访问
-#   - 0.0.0.0: 允许所有网络接口访问（包括局域网和远程访问）
-# --port: 监听的端口号（默认为8000）
-# --reload: 启用热重载，代码修改后自动重启
-# --workers: 工作进程数（默认为1）
-# --log-level: 日志级别（默认为info）
 ```
 
-# 部署更新
-docker compose up -d --build backend
-```
-
-### Nginx 配置更新
+## 3.预览环境
+- 上线前在预览环境进行测试访问，和正式环境更新一样，均采用docker compose
 ```bash
-# 修改 docker/nginx.conf 后
-docker compose up -d --build nginx
+# 创建外部网络（如果尚未创建）
+docker network create blog-network
+
+# 使用阿里云专用配置启动服务
+docker compose -f docker-compose.pre.yml up -d
 ```
 
-## 3.阿里云上线
+## 4.正式上线
 ```bash
 # 创建外部网络（如果尚未创建）
 docker network create blog-network
@@ -132,9 +126,7 @@ docker compose -f docker-compose.aliyun.yml up -d
 docker compose logs -f
 
 # 查看特定服务日志
-docker compose logs -f nginx-
-docker compose logs -f backend
-docker compose logs -f frontend
+docker compose logs -f nginx
 ```t
 
 ### 服务管理
@@ -144,7 +136,6 @@ docker compose down
 
 # 重启特定服务
 docker compose restart nginx
-docker compose restart backend
 
 # 查看服务状态
 docker compose ps
@@ -156,81 +147,11 @@ docker compose ps
 docker compose down -v
 
 # 重新构建所有服务
-docker compose build --no-cache
-docker compose up -d
+docker compose [-f docker-compose.aliyun.yml] up [-d] [--build [--no-cache] [nginx]]
 ```
 
-## 5. 故障排查指南
 
-### 常见问题和解决方案
-
-1. **前端构建失败**
-   - 检查 frontend/package.json 是否正确
-   - 检查 node_modules 是否完整
-   - 查看构建日志：`docker compose logs frontend`
-
-2. **后端服务无法启动**
-   - 检查环境变量配置
-   - 检查端口占用情况
-   - 查看日志：`docker compose logs backend`
-
-3. **Nginx 403 错误**
-   - 检查目录权限
-   - 确认前端文件是否正确构建
-   - 检查 nginx.conf 配置
-
-4. **网络连接问题**
-   ```bash
-   # 检查网络列表
-   docker network ls
-   
-   # 重新创建网络（如果需要）
-   docker network rm blog-network
-   docker network create blog-network
-   ```
-
-## 6. 性能优化建议
-
-1. **前端优化**
-   - 启用 gzip 压缩
-   - 配置适当的缓存策略
-   - 优化构建输出
-
-2. **后端优化**
-   - 适当调整 worker 数量
-   - 配置合理的超时时间
-   - 实现请求限流
-
-3. **Nginx 优化**
-   - 配置合理的 worker 连接数
-   - 启用 HTTP/2
-   - 优化静态文件缓存
-
-## 7. 安全建议
-
-1. **配置管理**
-   - 不要在代码中硬编码敏感信息
-   - 使用 .env 文件管理环境变量
-   - 定期更新依赖包
-
-2. **访问控制**
-   - 限制容器权限
-   - 使用非 root 用户运行服务
-   - 配置防火墙规则
-
-3. **日志管理**
-   - 实现日志轮转
-   - 记录关键操作日志
-   - 定期备份日志文件
-
-## 后续优化方向
-1. 添加容器监控
-2. 实现自动化部署
-3. 优化构建流程
-4. 添加测试覆盖
-5. 完善文档系统 
-
-## 待总结
+## 各容器关联
 1. frontend容器负责构建(build)，完成后自动退出
-2. 构建产物通过volume(frontend_dist)持久化
+2. 构建产物通过volume(frontend_build)持久化
 3. nginx容器挂载这个volume来提供静态文件服务

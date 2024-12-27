@@ -32,8 +32,24 @@
 - ⚡️ 高效的配置管理机制
 
 ## 技术栈
-- 前端：Vue.js + Vite
+- 前端：Vue.js + Vite + Element Plus
+  * Vue.js 3.0 - 渐进式JavaScript框架
+  * Vite - 下一代前端构建工具
+    - 基于原生 ES 模块的开发服务器
+    - 快速的冷启动和热更新
+    - 内置对 TypeScript、JSX、CSS 等的支持
+    - 优化的构建输出，支持代码分割
+    - 插件化架构，高度可扩展
+  * Element Plus - 基于Vue 3的组件库
 - 后端：Python + FastAPI
+  * Python 3.11 - 高性能的解释型语言
+  * FastAPI - 现代、快速的Web框架
+    - 基于Python 3.6+类型提示的API接口开发
+    - 极快的性能，与 NodeJS 和 Go 相当
+    - 自动生成交互式API文档
+    - 内置数据验证和序列化
+    - 支持异步编程和WebSocket
+    - 完整的IDE支持和类型检查
 - 代理：Nginx
 - 容器化：Docker + Docker Compose
 
