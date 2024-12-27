@@ -4,7 +4,7 @@ FROM alibaba-cloud-linux-3-registry.cn-hangzhou.cr.aliyuncs.com/alinux3/nginx_op
 # 复制 Nginx 配置文件
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-# 创建静态文件目录
+# 创建静态文件目录并设置权限
 RUN mkdir -p /usr/share/nginx/html && \
     chown -R nginx:nginx /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html

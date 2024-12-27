@@ -17,11 +17,9 @@ RUN npm config set registry https://registry.npmmirror.com && \
 RUN getent group node || groupadd -r node && \
     getent passwd node || useradd -r -g node -m node
 
-# 创建目录并设置权限（添加详细的错误处理）
-RUN set -e; \
-    mkdir -p /app/dist; \
-    chown -R node:node /app || { echo "Failed to change ownership"; exit 1; }; \
-    ls -la /app
+# 创建目录并设置权限
+RUN mkdir -p /app/dist && \
+    chown -R node:node /app
 
 # 复制前端项目文件
 COPY --chown=node:node frontend/package*.json ./
@@ -30,8 +28,16 @@ RUN npm ci --prefer-offline --no-audit --no-fund
 # 复制源代码
 COPY --chown=node:node frontend/ ./
 
-# 切换到非root用户
+# 切换到非root用户构建
 USER node
 
-# 默认命令
-CMD ["npm", "run", "build"]
+# 构建应用
+RUN npm run build
+
+# 设置构建文件的权限
+USER root
+RUN chown -R node:node /app/dist && \
+    chmod -R 755 /app/dist
+
+# 切换回非root用户
+USER node
