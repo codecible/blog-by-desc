@@ -13,16 +13,23 @@ services:
     depends_on:
       frontend:
         condition: service_completed_successfully
-      backend:
-        condition: service_healthy
     networks:
       - app-network
+    # 容器重启策略:
+    # unless-stopped - 除非手动停止,否则容器会在退出后自动重启
+    # 这与 always 的区别是:
+    # - always 会在 Docker daemon 重启时也重启容器
+    # - unless-stopped 只有在容器异常退出时才重启,手动停止的容器在 daemon 重启时不会启动
     restart: unless-stopped
     deploy:
       resources:
         limits:
           cpus: '0.5'
           memory: 500M
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
     logging:
       driver: "json-file"
       options:
@@ -46,6 +53,9 @@ services:
       - NODE_ENV=production
       # 增加Node.js内存限制到3GB，确保大型项目构建不会出现内存问题
       - NODE_OPTIONS="--max-old-space-size=3072"
+      - TZ=Asia/Shanghai
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
     logging:
       driver: "json-file"
       options:
@@ -84,6 +94,9 @@ services:
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
       - ENVIRONMENT=pre
+      - TZ=Asia/Shanghai
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
     logging:
       driver: "json-file"
       options:

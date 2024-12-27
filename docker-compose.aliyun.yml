@@ -7,8 +7,9 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./docker/nginx.conf:/etc/nginx/nginx.conf
-      - frontend_dist:/usr/share/nginx/html:ro
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - frontend_build:/usr/share/nginx/html:ro
+      - ./logs/nginx:/var/log/nginx:rw
     depends_on:
       frontend:
         condition: service_completed_successfully
@@ -16,40 +17,53 @@ services:
         condition: service_healthy
     networks:
       - app-network
-    restart: unless-stopped
+    restart: always
     deploy:
       resources:
         limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
           cpus: '0.5'
-          memory: 500M
+          memory: 512M
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: "50m"
+        max-file: "5"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
 
   frontend:
     build:
       context: .
       dockerfile: docker/frontend_aliyun.Dockerfile
     volumes:
-      - frontend_dist:/app/dist:rw
+      - frontend_build:/app/dist:rw
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 2G
+          cpus: '2.0'
+          memory: 4G
         reservations:
-          memory: 1G
+          memory: 2G
     environment:
-      # 设置Node.js的内存限制为1.5GB,防止构建时内存溢出
-      # 这个设置会覆盖Node.js默认的内存限制(约1GB)
-      - NODE_OPTIONS="--max-old-space-size=1536"
+      - NODE_ENV=production
+      - NODE_OPTIONS="--max-old-space-size=3072"
+      - TZ=Asia/Shanghai
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: "50m"
+        max-file: "5"
 
   backend:
     build:
@@ -60,43 +74,53 @@ services:
     env_file:
       - backend/.env.production
     volumes:
-      - ./logs:/app/logs
-      - ./uploads:/app/uploads
+      - ./logs:/app/logs:rw
+      - ./output:/app/output:rw
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
       interval: 30s
       timeout: 10s
-      retries: 2
-      start_period: 10s
-    restart: unless-stopped
+      retries: 5
+      start_period: 60s
+    restart: always
     networks:
       - app-network
     deploy:
       resources:
         limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
           cpus: '1.0'
-          memory: 1G
-    command: >
-      uvicorn main:app 
-      --host 0.0.0.0 
-      --port 3001 
-      --workers 4
-      --log-level info
+          memory: 2G
+    command: uvicorn main:app --host 0.0.0.0 --port 3001 --workers 8 --timeout-keep-alive 600 --timeout-graceful-shutdown 600
     environment:
+      - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
+      - ENVIRONMENT=production
+      - PYTHONOPTIMIZE=1
+      - TZ=Asia/Shanghai
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: "50m"
+        max-file: "5"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
 
 networks:
   app-network:
-    # 方案1：使用外部网络（需要预先创建）
     name: blog-network
     external: true
 
 volumes:
-  frontend_dist:
+  frontend_build:
+    driver: local
   logs:
-  uploads:
+    driver: local
+  output:
+    driver: local
