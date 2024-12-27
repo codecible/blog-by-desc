@@ -11,7 +11,8 @@ RUN npm config set registry https://registry.npmmirror.com && \
     npm config set fetch-retry-mintimeout 20000 && \
     npm config set fetch-retry-maxtimeout 120000 && \
     npm config set fetch-timeout 120000 && \
-    npm config set strict-ssl false
+    npm config set strict-ssl false && \
+    npm config set legacy-peer-deps false
 
 # 确保 node 用户和组存在
 RUN getent group node || groupadd -r node && \
@@ -23,7 +24,10 @@ RUN mkdir -p /app/dist && \
 
 # 复制前端项目文件
 COPY --chown=node:node frontend/package*.json ./
-RUN npm ci --prefer-offline --no-audit --no-fund
+
+# 使用更稳定的安装方式
+RUN npm install --production=false --no-audit --no-fund || \
+    (npm cache clean --force && npm install --production=false --no-audit --no-fund)
 
 # 复制源代码
 COPY --chown=node:node frontend/ ./
