@@ -53,7 +53,7 @@ export default defineConfig({
         manualChunks: {
           'vue-vendor': ['vue', '@vue/runtime-core', '@vue/runtime-dom', '@vue/reactivity'],
           'element-vendor': ['element-plus'],
-          'utils-vendor': ['lodash', 'axios', 'moment'],
+          'utils-vendor': ['lodash', 'axios']
         }
       }
     },
