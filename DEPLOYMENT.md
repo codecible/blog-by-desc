@@ -1,4 +1,11 @@
 # 部署和操作手册
+
+## 环境要求
+- Python 3.11 或 3.12（不支持 Python 3.13）
+- Node.js 18+ LTS 版本
+- Rust 工具链（用于编译某些依赖，通过 https://rustup.rs/ 安装）
+- Docker 和 Docker Compose（用于容器化部署）
+
 本项目采用前后端分离架构，使用 Docker 进行容器化部署，包含三个主要服务：Nginx 服务、前端构建服务和后端服务。
 
 > 部署配置说明
