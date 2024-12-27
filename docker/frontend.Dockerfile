@@ -13,7 +13,9 @@ RUN npm config set registry https://registry.npmmirror.com && \
 
 # 复制前端项目文件
 COPY frontend/package*.json ./
-RUN npm ci --prefer-offline --no-audit --no-fund
+
+# 使用 npm install 而不是 npm ci，这样更灵活
+RUN npm install --prefer-offline --no-audit --no-fund
 
 # 复制源代码
 COPY frontend/ ./

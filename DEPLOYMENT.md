@@ -229,3 +229,8 @@ docker compose up -d
 3. 优化构建流程
 4. 添加测试覆盖
 5. 完善文档系统 
+
+## 待总结
+1. frontend容器负责构建(build)，完成后自动退出
+2. 构建产物通过volume(frontend_dist)持久化
+3. nginx容器挂载这个volume来提供静态文件服务
