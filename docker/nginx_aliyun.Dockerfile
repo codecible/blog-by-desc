@@ -15,8 +15,8 @@ RUN mkdir -p /usr/share/nginx/html \
     /tmp/nginx \
     && chmod -R 755 /usr/share/nginx/html \
     /var/cache/nginx \
-    /var/log/nginx \
-    /tmp/nginx
+    /tmp/nginx \
+    && chmod -R 766 /var/log/nginx
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
