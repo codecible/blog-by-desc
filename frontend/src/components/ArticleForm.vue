@@ -9,6 +9,8 @@ const formData = reactive({
   coreTopic: ''
 })
 
+const loadingText = ref('正在生成文章')
+
 // 表单验证规则
 const rules = reactive({
   description: [
@@ -75,7 +77,6 @@ const generateArticle = async () => {
       }, 300000); // 5分钟超时
 
       // 更新加载状态文字
-      const loadingText = ref('正在生成文章');
       const loadingInterval = setInterval(() => {
         loadingText.value = loadingText.value + '.';
         if (loadingText.value.endsWith('....')) {
