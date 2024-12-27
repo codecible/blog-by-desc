@@ -40,21 +40,23 @@ export default defineConfig({
   },
 
   build: {
-    // 禁用源码映射
-    sourcemap: false,
-    
-    // 禁用代码分割
-    cssCodeSplit: false,
-    
-    // 配置 Rollup 打包选项
-    rollupOptions: {
-      output: {
-        // 禁用代码分割，将所有代码打包到一起
-        manualChunks: undefined
+    sourcemap: true,
+    cssCodeSplit: true,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
       }
     },
-    
-    // 禁用压缩
-    minify: false
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        }
+      }
+    }
   }
 })
