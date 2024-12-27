@@ -52,8 +52,7 @@ export default defineConfig({
         // 手动配置代码分割
         manualChunks: {
           'vue-vendor': ['vue', '@vue/runtime-core', '@vue/runtime-dom', '@vue/reactivity'],
-          'element-vendor': ['element-plus'],
-          'utils-vendor': ['lodash', 'axios']
+          'element-vendor': ['element-plus']
         }
       }
     },
