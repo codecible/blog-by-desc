@@ -50,53 +50,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // 手动配置代码分割
-        manualChunks(id) {
-          // node_modules 依赖包分割
-          if (id.includes('node_modules')) {
-            // vue相关包
-            if (id.includes('vue') || id.includes('pinia')) {
-              return 'vendor-vue'
-            }
-            // UI组件库
-            if (id.includes('element-plus') || id.includes('@element-plus')) {
-              return 'vendor-element'
-            }
-            // 工具库
-            if (id.includes('lodash') || id.includes('axios') || id.includes('moment')) {
-              return 'vendor-utils'
-            }
-            // 其他第三方库
-            return 'vendor-others'
-          }
-          // 根据文件路径分割业务代码
-          if (id.includes('src/')) {
-            if (id.includes('/components/')) {
-              return 'components'
-            }
-            if (id.includes('/views/')) {
-              return 'views'
-            }
-            if (id.includes('/store/')) {
-              return 'store'
-            }
-          }
-        },
-        // 配��chunk文件名格式
-        chunkFileNames: 'assets/js/[name]-[hash].js',
-        // 配置入口文件名格式
-        entryFileNames: 'assets/js/[name]-[hash].js',
-        // 配置资源文件名格式
-        assetFileNames: (assetInfo) => {
-          const info = assetInfo.name.split('.')
-          let extType = info[info.length - 1]
-          if (/\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/i.test(assetInfo.name)) {
-            extType = 'media'
-          } else if (/\.(png|jpe?g|gif|svg|ico|webp)(\?.*)?$/i.test(assetInfo.name)) {
-            extType = 'img'
-          } else if (/\.(woff2?|eot|ttf|otf)(\?.*)?$/i.test(assetInfo.name)) {
-            extType = 'fonts'
-          }
-          return `assets/${extType}/[name]-[hash][extname]`
+        manualChunks: {
+          'vue-vendor': ['vue', '@vue/runtime-core', '@vue/runtime-dom', '@vue/reactivity'],
+          'element-vendor': ['element-plus'],
+          'utils-vendor': ['lodash', 'axios', 'moment'],
         }
       }
     },
