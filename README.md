@@ -1,6 +1,6 @@
 # AI 文章生成器 v0.2.0
 
-这是一个基于Monica AI的智能文章生成工具，可以根据用户提供的描述和核心主题自动生成高质量的文章。
+这是一个基于Monica AI的智能文章生成工具，可以根据用户提供的描述和核心主题自动生成高质量的文章。现在支持多种AI提供商，包括Monica AI和智谱AI。
 
 ## 最新更新
 
@@ -11,6 +11,8 @@
 - 🚀 更流畅的用户体验
 - 🔒 支持Docker Compose快速部署
 - 🌩️ 支持阿里云环境部署
+- 🔄 支持多AI提供商切换（Monica AI / 智谱AI）
+- ⚡️ 优化的配置管理，使用单例模式提高性能
 
 ## 功能特点
 
@@ -26,12 +28,29 @@
 - 📋 一键复制文章内容
 - 💾 下载为Markdown文件
 - 🔄 支持返回编辑功能
+- 🔀 支持多AI提供商灵活切换
+- ⚡️ 高效的配置管理机制
 
 ## 技术栈
 - 前端：Vue.js + Vite
 - 后端：Python + FastAPI
 - 代理：Nginx
 - 容器化：Docker + Docker Compose
+
+## 配置说明
+
+### 环境变量配置
+- `AI_PROVIDER`: AI提供商选择（"monica"或"zhipu"）
+- `MONICA_API_KEY`: Monica AI的API密钥
+- `ZHIPU_API_KEY`: 智谱AI的API密钥
+- `MONICA_MODEL`: Monica AI的模型名称
+- `ZHIPU_MODEL`: 智谱AI的模型名称
+
+### 配置管理特性
+- 使用单例模式管理配置，确保全局配置一致性
+- 支持运行时动态切换AI提供商
+- 自动验证配置有效性
+- 详细的配置加载日志
 
 ## 部署说明
 参见[DEPLOYMENT.md](DEPLOYMENT.md)
@@ -60,7 +79,7 @@ blog-by-desc/
 │   ├── models/             # 数据模型目录
 │   │   └── article.py      # 文章数据模型
 │   ├── utils/              # 工具函数目录
-│   │   └── logger.py       # 日志工具
+│   │   └── logger.py       # 日志工��
 │   └── tests/              # 测试目录
 ├── frontend/               # 前端代码目录
 │   ├── src/               # 源代码目录

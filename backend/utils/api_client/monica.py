@@ -22,17 +22,14 @@ class MonicaAPIClient(BaseAPIClient):
         
         从配置中获取API密钥和端点信息
         """
-        self.config = Config()
+        self.config = Config.get_instance()
         
-        # 确保使用Monica AI
-        if self.config.AI_PROVIDER != "monica":
-            raise ValueError("配置的AI提供商不是Monica")
-            
         # 初始化异步OpenAI客户端
         self.client = AsyncOpenAI(
             base_url=self.config.MONICA_API_ENDPOINT,
             api_key=self.config.MONICA_API_KEY
         )
+        logger.info(f"初始化Monica AI客户端成功，使用模型: {self.config.MONICA_MODEL}")
         
     async def call_api(
         self,

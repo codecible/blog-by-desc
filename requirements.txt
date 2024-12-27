@@ -8,6 +8,7 @@ httpx==0.25.2  # FastAPI推荐的异步HTTP客户端
 
 # AI和OpenAI相关
 openai==1.6.1
+zhipuai>=1.0.7
 
 # 环境变量和配置
 python-dotenv==1.0.0

@@ -40,9 +40,10 @@ class ArticleGenerator:
         Args:
             model_type: AI提供商类型，默认为"monica"
         """
+
         self.api_client = APIClient(model_type)
         self.cache = Cache()
-        self.config = Config()
+        self.config = Config.get_instance()
         
     def _get_cache_key(self, *args) -> str:
         """
@@ -54,8 +55,15 @@ class ArticleGenerator:
         Returns:
             str: MD5格式的缓存键
         """
-        model_type = self.api_client.client.config.AI_PROVIDER
-        content = f"{model_type}:" + ''.join(str(arg) for arg in args)
+        # 获取模型信息
+        provider = self.api_client.client.config.AI_PROVIDER
+        model = (
+            self.api_client.client.config.MONICA_MODEL 
+            if provider == "monica" 
+            else self.api_client.client.config.ZHIPU_MODEL
+        )
+        # 添加提供商和模型信息到缓存键
+        content = f"{provider}:{model}:" + ''.join(str(arg) for arg in args)
         return hashlib.md5(content.encode()).hexdigest()
         
     async def generate_directions(
@@ -338,7 +346,9 @@ class ArticleGenerator:
         Args:
             model_type: 新的AI提供商类型
         """
-        if model_type != self.api_client.client.config.AI_PROVIDER:
+        current_provider = self.api_client.client.config.AI_PROVIDER
+        if model_type != current_provider:
+            logger.info(f"切换AI提供商: {current_provider} -> {model_type}")
             self.api_client = APIClient(model_type)
             
     async def generate(self, request: ArticleRequest) -> ArticleResponse:
@@ -354,7 +364,7 @@ class ArticleGenerator:
         Raises:
             Exception: 当文章生成过程中发生错误时抛出
         """
-        logger.info(f"开始生成文章: {request.dict()}")
+        logger.info(f"开始生成文章: 描述长度={len(request.description)}, AI提供商={request.model_type}")
         
         try:
             # 如果需要，切换到新的模型
@@ -371,7 +381,7 @@ class ArticleGenerator:
             # 保存文章
             file_path = self.save_article(title, content, directions)
             
-            # 创建响应
+            # 创���响应
             response = ArticleResponse(
                 success=True,
                 message="文章生成成功",
@@ -383,9 +393,9 @@ class ArticleGenerator:
                 )
             )
             
-            logger.info(f"文章生成成功: {file_path}")
+            logger.info(f"文章生成成功: 文件={file_path}, AI提供商={request.model_type}, 内容长度={len(content)}")
             return response
             
         except Exception as e:
-            logger.error(f"生成文章时发生错误: {str(e)}")
+            logger.error(f"生成文章时发生错误: {str(e)}, AI提供商={request.model_type}")
             raise 
