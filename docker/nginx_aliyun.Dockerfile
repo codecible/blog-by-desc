@@ -13,10 +13,13 @@ RUN mkdir -p /usr/share/nginx/html \
     /var/cache/nginx \
     /var/log/nginx \
     /tmp/nginx \
-    && chmod -R 755 /usr/share/nginx/html \
+    && chmod 755 /usr/share/nginx/html \
     /var/cache/nginx \
     /tmp/nginx \
-    && chmod -R 766 /var/log/nginx
+    && chmod 744 /var/log/nginx \
+    && touch /var/log/nginx/access.log /var/log/nginx/error.log \
+    && chown nginx:nginx /var/log/nginx/access.log /var/log/nginx/error.log \
+    && chmod 644 /var/log/nginx/access.log /var/log/nginx/error.log
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
