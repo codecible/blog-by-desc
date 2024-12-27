@@ -11,8 +11,7 @@ RUN npm config set registry https://registry.npmmirror.com && \
     npm config set fetch-retry-mintimeout 20000 && \
     npm config set fetch-retry-maxtimeout 120000 && \
     npm config set fetch-timeout 120000 && \
-    npm config set strict-ssl false && \
-    npm config set legacy-peer-deps false
+    npm config set strict-ssl false
 
 # 确保 node 用户和组存在
 RUN getent group node || groupadd -r node && \
@@ -25,17 +24,18 @@ RUN mkdir -p /app/dist && \
 # 复制前端项目文件
 COPY --chown=node:node frontend/package*.json ./
 
-# 使用更稳定的安装方式
-RUN npm install --production=false --no-audit --no-fund || \
-    (npm cache clean --force && npm install --production=false --no-audit --no-fund)
+# 安装依赖
+RUN npm install --production=false --no-audit --no-fund
 
-# 复制源代码
+# 复制源代码和环境配置
 COPY --chown=node:node frontend/ ./
+COPY --chown=node:node frontend/.env.production ./.env.production
 
 # 切换到非root用户构建
 USER node
 
-# 构建应用
+# 设置环境变量并构建
+ENV NODE_ENV=production
 RUN npm run build
 
 # 设置构建文件的权限
