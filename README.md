@@ -78,8 +78,7 @@ blog-by-desc/
 ├── backend/                 # 后端代码目录
 │   ├── __init__.py         # Python包初始化文件
 │   ├── main.py             # Web服务入口
-│   ├── cli.py              # 命令行工具入口
-│   ├── config.py           # 配置文件
+│   ├── config.py           # 配置管理
 │   ├── requirements.txt    # Python依赖包
 │   ├── .env.example        # 环境变量示例文件
 │   ├── .env                # 环境变量配置文件
@@ -87,16 +86,13 @@ blog-by-desc/
 │   │   └── article.py      # 文章相关路由
 │   ├── services/           # 服务层目录
 │   │   └── article_generator.py  # 文章生成服务
-│   ├── schemas/            # 数据验证模型目录
-│   │   ├── __init__.py     # 包初始化文件
-│   │   ├── article.py      # 文章相关的数据模型
-│   │   ├── base.py         # 基础数据模型
-│   │   └── errors.py       # 错误响应模型
 │   ├── models/             # 数据模型目录
 │   │   └── article.py      # 文章数据模型
-│   ├── utils/              # 工具函数目录
-│   │   └── logger.py       # 日志工��
-│   └── tests/              # 测试目录
+│   └── utils/              # 工具函数目录
+│       ├── logger.py       # 日志工具
+│       └── api_client/     # API客户端目录
+│           ├── monica.py   # Monica AI客户端
+│           └── zhipu.py    # 智谱AI客户端
 ├── frontend/               # 前端代码目录
 │   ├── src/               # 源代码目录
 │   │   ├── components/    # Vue组件目录
@@ -106,56 +102,70 @@ blog-by-desc/
 │   │   │   └── index.js   # 路由配置文件
 │   │   ├── App.vue        # 根组件
 │   │   └── main.js        # 应用入口文件
-│   ├── css/               # 样式文件目录
-│   ├── js/                # JavaScript文件目录
-│   ├── index.html         # HTML入口文件
+│   ├── public/            # 静态资源目录
 │   ├── package.json       # 项目依赖配置
-│   ├── vite.config.js     # Vite配置文件
-│   └── .npmrc             # NPM配置文件
-├── output/                 # 生成的文章输出目录
-├── logs/                   # 日志输出目录
-├── docker/                 # Docker相关配置
+│   └── vite.config.js     # Vite配置文件
+├── docker/                # Docker相关配置
 │   ├── backend.Dockerfile           # 后端服务Dockerfile
 │   ├── backend_aliyun.Dockerfile    # 阿里云专用后端Dockerfile
 │   ├── frontend.Dockerfile          # 前端服务Dockerfile
 │   ├── frontend_aliyun.Dockerfile   # 阿里云专用前端Dockerfile
 │   ├── nginx.Dockerfile             # Nginx服务Dockerfile
 │   ├── nginx_aliyun.Dockerfile      # 阿里云专用Nginx Dockerfile
-│   └── nginx.conf                   # Nginx配置文件
+│   ├── nginx.conf                   # Nginx配置文件
+│   └── init-nginx-logs.sh           # Nginx日志初始化脚本
+├── logs/                   # 日志目录
+│   ├── app/               # 应用日志
+│   └── nginx/             # Nginx日志
 ├── docker-compose.yml              # 本地开发环境配置
-├── docker-compose.aliyun.yml       # 阿里云环境专用配置
+├── docker-compose.pre.yml          # 预发布环境配置
+├── docker-compose.aliyun.yml       # 阿里云环境配置
+├── DEPLOYMENT.md                   # 部署说明文档
+├── CHANGELOG.md                    # 更新日志
 └── .gitignore                     # Git忽略文件
 ```
 
-### 目录功能详细描述
+### 目录功能说明
 
-#### backend/routers
-1. 处理HTTP请求路由
-2. 参数验证和错误处理
-3. 调用相应的服务层处理业务逻辑
-4. 返回处理结果
+#### backend/ - 后端服务
+- `main.py`: Web服务入口，配置FastAPI应用
+- `config.py`: 配置管理，使用单例模式实现
+- `routers/`: API路由处理，包含所有HTTP端点
+  * 1. 处理HTTP请求路由
+  * 2. 参数验证和错误处理
+  * 3. 调用相应的服务层处理业务逻辑
+  * 4. 返回处理结果
+- `services/`: 核心业务逻辑实现
+  * 1. 实现核心业务逻辑
+  * 2. 调用外部API服务
+  * 3. 处理数据转换和数据验证
+  * 4. 实现缓存机制
+  * 5. 错误处理和重试机制 
+- `models/`: 数据模型定义
+  * 1. 定义数据模型和数据结构
+  * 2. 提供数据验证规则
+    - 字段类型检查
+    - 长度限制
+    - 格式验证
+    - 自定义验证规则
+  * 3. 实现数据转换和序列化
+  * 4. 提供模型间的关系映射
+- `utils/`: 工具函数和API客户端实现
 
-#### backend/schemas
-1. 定义请求和响应的数据模型
-2. 提供数据验证规则
-   - 字段类型检查
-   - 长度限制
-   - 格式验证
-   - 自定义验证规则
-3. 自动生成API文档
-   - 请求/响应模型说明
-   - 字段说明
-   - 示例数据
-4. 错误处理模型
-   - 统一的错误响应格式
-   - 错误码定义
-   - 详细的错误信息
+#### frontend/ - 前端应用
+- `src/components/`: Vue组件，实现UI交互
+- `src/router/`: 前端路由配置
+- `public/`: 静态资源文件
+- `vite.config.js`: Vite构建工具配置
 
-#### backend/services
-1. 实现核心业务逻辑
-2. 调用外部API服务
-3. 处理数据转换
-4. 实现缓存机制
+#### docker/ - 容器化配置
+- 包含所有环境的Dockerfile
+- Nginx配置和日志管理
+- 支持本地开发、预发布和阿里云环境
+
+#### logs/ - 日志管理
+- `app/`: 应用程序日志
+- `nginx/`: Nginx访问和错误日志
 
 ## 输出说明
 
