@@ -111,14 +111,14 @@ blog-by-desc/
 │   ├── nginx_aliyun.Dockerfile      # 阿里云专用Nginx Dockerfile
 │   ├── nginx.conf                   # Nginx配置文件
 │   └── init-nginx-logs.sh           # Nginx日志初始化脚本
-├── logs/                  # 日志目录
-│   ├── app/              # 应用日志
-│   └── nginx/            # Nginx日志
-├── docker-compose.pre.yml         # 预发布环境配置
-├── docker-compose.aliyun.yml      # 阿里云环境配置
-├── DEPLOYMENT.md                  # 部署说明文档
-├── CHANGELOG.md                   # 更新日志
-└── .gitignore                    # Git忽略文件
+├── logs/                            # 日志目录
+│   ├── app/                         # 应用日志
+│   └── nginx/                       # Nginx日志
+├── docker-compose.pre.yml           # 预发布环境配置
+├── docker-compose.aliyun.yml        # 阿里云环境配置
+├── DEPLOYMENT.md                    # 部署说明文档
+├── CHANGELOG.md                     # 更新日志
+└── .gitignore                       # Git忽略文件
 ```
 
 ### 目录功能说明
@@ -136,7 +136,7 @@ blog-by-desc/
   * 2. 调用外部API服务
   * 3. 处理数据转换和数据验证
   * 4. 实现缓存机制
-  * 5. 错误处理和重试机制 
+  * 5. 错误处理和重试机制
 - `models/`: 数据模型定义
   * 1. 定义数据模型和数据结构
   * 2. 提供数据验证规则
@@ -191,4 +191,3 @@ blog-by-desc/
 ## 许可证
 
 MIT License
-

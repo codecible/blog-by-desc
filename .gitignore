@@ -7,6 +7,7 @@
 .pydevproject
 .settings/
 .cursorrules
+.editorconfig
 
 # Project specific
 logs/
