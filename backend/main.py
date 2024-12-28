@@ -26,12 +26,11 @@ def load_env_file():
     env_files = [
         current_dir / '.env',                    # 本地开发环境
         current_dir / '.env.production',         # 生产环境
-        current_dir / '.env.example'             # 示例配置（最低优先级）
     ]
 
     for env_file in env_files:
         if env_file.exists():
-            load_dotenv(env_file)
+            load_dotenv(env_file, override=True)  # 保持 override=True 来强制重新加载
             print(f"已加载环境变量文件: {env_file}")
             return
     print("警告：未找到任何环境变量文件")
@@ -137,7 +136,7 @@ app.add_middleware(
 ###################
 
 # 注册路由
-app.include_router(article.router, prefix="/blog")
+app.include_router(article.router, prefix="/article")
 
 @app.get("/health")
 async def health_check():

@@ -73,7 +73,9 @@ npm run build
 ```bash
 # 本地开发
 # 基于项目根目录
-python3.11 -m venv venv                   # 创建新的虚拟环境
+# 建议3.11版本，3.13版本不支持
+python3 -m venv venv                      # 创建新的虚拟环境
+# 若已存在虚拟环境，则跳过创建
 source venv/bin/activate                  # 激活虚拟环境
 pip install --upgrade pip                 # 升级pip
 pip install -r backend/requirements.txt   # 安装依赖
@@ -92,9 +94,9 @@ python3.11 -m uvicorn backend.main:app --reload
 
 # 方式2：自定义配置
 # 仅本地访问
-python -m uvicorn backend.main:app --host 127.0.0.1 --port 3001 --reload
+python3.11 -m uvicorn backend.main:app --host 127.0.0.1 --port 3001 --reload
 # 允许局域网访问
-python -m uvicorn backend.main:app --host 0.0.0.0 --port 3001 --reload
+python3.11 -m uvicorn backend.main:app --host 0.0.0.0 --port 3001 --reload
 ```
 
 ## 3.预览环境
@@ -113,7 +115,9 @@ docker compose -f docker-compose.pre.yml up -d
 docker network create blog-network
 
 # 使用阿里云专用配置启动服务
-docker compose -f docker-compose.aliyun.yml up -d
+cp docker-compose.aliyun.yml docker-compose.yml
+docker compose up -d
+# docker compose -f docker-compose.aliyun.yml up -d
 ```
 
 ## 4. 常用运维操作
