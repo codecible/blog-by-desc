@@ -5,83 +5,43 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z" fill="currentColor"/>
         </svg>
-        返回
+        返回首页
       </router-link>
-      <h1>小红书文案生成器</h1>
+      <h1>小红书标题生成（跑者专享）</h1>
     </div>
 
     <div class="form-container">
       <div class="form-group">
-        <label>主题描述</label>
+        <label><span class="required">*</span>内容描述</label>
         <textarea
           v-model="formData.description"
-          placeholder="描述你想要生成的文案主题，例如：分享一款新买的化妆品使用体验"
+          placeholder="描述你想要生成的文案主题，例如：分享一次跑步体验"
           rows="4"
+          @input="validateDescription"
+          :disabled="isGenerating"
         ></textarea>
-      </div>
-
-      <div class="form-group">
-        <label>文案风格</label>
-        <select v-model="formData.style">
-          <option value="casual">轻松日常风</option>
-          <option value="professional">专业测评风</option>
-          <option value="emotional">感性治愈风</option>
-          <option value="humor">幽默搞笑风</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>关键词</label>
-        <input
-          type="text"
-          v-model="formData.keywords"
-          placeholder="输入关键词，用逗号分隔，例如：好用,性价比高,安全"
-        />
-      </div>
-
-      <div class="form-group">
-        <label>标签数量</label>
-        <input
-          type="number"
-          v-model="formData.tagCount"
-          min="3"
-          max="20"
-          placeholder="建议3-20个标签"
-        />
-      </div>
-
-      <button class="submit-button" @click="generateContent" :disabled="isGenerating">
-        {{ isGenerating ? '生成中...' : '开始生成' }}
-      </button>
-    </div>
-
-    <div v-if="generatedContent" class="preview-container">
-      <div class="preview-header">
-        <h2>生成结果</h2>
-        <div class="preview-actions">
-          <button @click="copyContent" class="action-button">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z" fill="currentColor"/>
-            </svg>
-            复制文案
-          </button>
-          <button @click="regenerateContent" class="action-button">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4C7.58 4 4.01 7.58 4.01 12C4.01 16.42 7.58 20 12 20C15.73 20 18.84 17.45 19.73 14H17.65C16.83 16.33 14.61 18 12 18C8.69 18 6 15.31 6 12C6 8.69 8.69 6 12 6C13.66 6 15.14 6.69 16.22 7.78L13 11H20V4L17.65 6.35Z" fill="currentColor"/>
-            </svg>
-            重新生成
-          </button>
+        <div class="info-container">
+          <div class="input-tips">
+            *描述越清晰，生成内容才更合适哦
+          </div>
+          <div class="input-info" :class="{ 'error': !isDescriptionValid && formData.description.length > 0 }">
+            {{ formData.description.length }}/500字
+            <span v-if="!isDescriptionValid && formData.description.length > 0">
+              (需要在3-500字之间)
+            </span>
+          </div>
         </div>
       </div>
 
-      <div class="content-preview">
-        <div class="title">{{ generatedContent.title }}</div>
-        <div class="content">{{ generatedContent.content }}</div>
-        <div class="tags">
-          <span v-for="(tag, index) in generatedContent.tags" :key="index" class="tag">
-            #{{ tag }}
-          </span>
-        </div>
+      <div class="button-group">
+        <button
+          class="submit-button"
+          @click="generateContent"
+          :disabled="isGenerating || !isDescriptionValid || formData.description.length === 0"
+        >
+          <span v-if="isGenerating" class="loading-spinner"></span>
+          {{ isGenerating ? '生成中...' : '开始生成' }}
+        </button>
       </div>
     </div>
   </div>
@@ -89,44 +49,89 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const formData = reactive({
   description: '',
-  style: 'casual',
-  keywords: '',
-  tagCount: 5
 })
 
 const isGenerating = ref(false)
-const generatedContent = ref(null)
+const isDescriptionValid = ref(false)
+const loadingText = ref('正在生成')
+
+const validateDescription = () => {
+  const length = formData.description.length
+  isDescriptionValid.value = length >= 3 && length <= 500
+}
 
 const generateContent = async () => {
+  if (!isDescriptionValid.value) return
+
   isGenerating.value = true
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 300000) // 5分钟超时
+  let loadingInterval
+
   try {
-    // TODO: 调用后端API生成内容
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    generatedContent.value = {
-      title: '测试标题',
-      content: '测试内容',
-      tags: ['测试标签1', '测试标签2', '测试标签3']
+    // 更新加载状态文字
+    loadingInterval = setInterval(() => {
+      loadingText.value = loadingText.value + '.'
+      if (loadingText.value.endsWith('....')) {
+        loadingText.value = '正在生成'
+      }
+    }, 500)
+
+    const response = await Promise.race([
+      fetch(`${import.meta.env.VITE_API_URL}/article/generatetitle`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          description: formData.description,
+          platform: 'xiaohongshu'
+        }),
+        signal: controller.signal,
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('请求超时，请重试')), 300000)
+      )
+    ])
+
+    if (!response) {
+      throw new Error('未收到服务器响应')
     }
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => '未知错误')
+      throw new Error(`请求失败: ${response.status} ${errorText}`)
+    }
+
+    const data = await response.json()
+    if (!data || !data.data || !data.data.content) {
+      throw new Error('生成内容为空')
+    }
+
+    // 导航到预览页面
+    router.push({
+      name: 'xiaohongshu-preview',
+      params: { id: new Date().getTime() },
+      query: { data: JSON.stringify(data) }
+    })
+
   } catch (error) {
     console.error('生成失败:', error)
+    ElMessage.error(error.message || '生成失败，请重试')
   } finally {
+    clearTimeout(timeoutId)
+    if (loadingInterval) {
+      clearInterval(loadingInterval)
+    }
     isGenerating.value = false
+    loadingText.value = '正在生成'
   }
-}
-
-const regenerateContent = () => {
-  generateContent()
-}
-
-const copyContent = () => {
-  if (!generatedContent.value) return
-
-  const text = `${generatedContent.value.title}\n\n${generatedContent.value.content}\n\n${generatedContent.value.tags.map(tag => '#' + tag).join(' ')}`
-  navigator.clipboard.writeText(text)
 }
 </script>
 
@@ -134,13 +139,17 @@ const copyContent = () => {
 .xiaohongshu-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  min-height: 100vh;
+  background: var(--background-color);
 }
 
 .header {
+  max-width: 800px;
+  margin: 0 auto 40px;
   display: flex;
   align-items: center;
-  margin-bottom: 40px;
+  gap: 20px;
+  padding: 20px;
 }
 
 .back-button {
@@ -149,15 +158,29 @@ const copyContent = () => {
   gap: 8px;
   text-decoration: none;
   color: var(--text-color);
-  margin-right: 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  transform: translateX(-2px);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  background: linear-gradient(135deg, #1d1d1f 0%, #434343 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .form-container {
-  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 0 20px 30px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 .form-group {
@@ -170,7 +193,7 @@ label {
   font-weight: 500;
 }
 
-input, textarea, select {
+textarea {
   width: 100%;
   padding: 12px;
   border: 1px solid var(--border-color);
@@ -179,17 +202,28 @@ input, textarea, select {
   transition: all 0.3s ease;
 }
 
-input:focus, textarea:focus, select:focus {
+textarea:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.2);
 }
 
-.submit-button {
-  width: 100%;
+textarea:disabled {
+  background-color: #f5f5f7;
+  cursor: not-allowed;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+
+.submit-button, .regenerate-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 14px;
-  background: var(--primary-color);
-  color: white;
   border: none;
   border-radius: 10px;
   font-size: 16px;
@@ -198,75 +232,62 @@ input:focus, textarea:focus, select:focus {
   transition: all 0.3s ease;
 }
 
-.submit-button:disabled {
+.submit-button {
+  flex: 2;
+  background: var(--primary-color);
+  color: white;
+}
+
+.regenerate-button {
+  flex: 1;
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.submit-button:disabled,
+.regenerate-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+  background: #ccc;
 }
 
-.preview-container {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
-.preview-header {
+.info-container {
+  margin-top: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 }
 
-.preview-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.action-button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: var(--background-color);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.action-button:hover {
-  background: #e5e5e7;
-}
-
-.content-preview {
-  padding: 20px;
-  background: var(--background-color);
-  border-radius: 10px;
-}
-
-.title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 16px;
-}
-
-.content {
-  margin-bottom: 20px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tag {
-  padding: 4px 12px;
-  background: #e5e5e7;
-  border-radius: 16px;
+.input-tips {
   font-size: 14px;
+  color: #6e6e73;
+  font-style: italic;
+}
+
+.input-info {
+  font-size: 14px;
+  color: #666;
+}
+
+.input-info.error {
+  color: #ff4d4f;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {
@@ -274,24 +295,22 @@ input:focus, textarea:focus, select:focus {
     padding: 10px;
   }
 
-  .form-container,
-  .preview-container {
+  .form-container {
     padding: 20px;
   }
 
-  .preview-header {
+  .button-group {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
   }
 
-  .preview-actions {
+  .submit-button,
+  .regenerate-button {
     width: 100%;
   }
+}
 
-  .action-button {
-    flex: 1;
-    justify-content: center;
-  }
+.required {
+  color: #ff4d4f;
+  margin-right: 4px;
 }
 </style>

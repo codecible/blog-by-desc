@@ -4,7 +4,7 @@
 这个模块定义了与文章生成相关的所有数据模型。
 """
 
-from typing import List, Optional, Literal
+from typing import List, Optional, Literal, Dict, Any
 from pydantic import BaseModel, Field, ConfigDict
 from .base import BaseResponse
 
@@ -52,11 +52,11 @@ class ArticleData(BaseModel):
     """
     content: str = Field(
         ...,
-        description="文章内容"
+        description="生成的文章内容"
     )
     file_path: str = Field(
         ...,
-        description="文章保存的文件路径"
+        description="保存的文件路径"
     )
 
     model_config = ConfigDict(
@@ -108,3 +108,15 @@ class ArticleResponse(BaseResponse):
         },
         protected_namespaces=()
     )
+
+class TitleRequest(BaseModel):
+    description: str = Field(..., min_length=5, max_length=1000, description="文章描述")
+    platform: str = Field(..., description="目标平台，如：xiaohongshu")
+
+class TitleData(BaseModel):
+    content: str = Field(..., description="生成的标题内容")
+
+class TitleResponse(BaseModel):
+    success: bool = Field(..., description="是否成功")
+    message: str = Field(..., description="响应消息")
+    data: Optional[TitleData] = Field(None, description="标题数据")

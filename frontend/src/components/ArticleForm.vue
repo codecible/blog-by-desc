@@ -2,8 +2,10 @@
 import { ref, reactive, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import ArticlePreview from './ArticlePreview.vue'
+import { useRouter } from 'vue-router'
 
 // 表单数据
+const router = useRouter()
 const formRef = ref(null)
 const loading = ref(false)
 const loadingText = ref('正在生成文章')
@@ -123,6 +125,13 @@ const generateArticle = async () => {
       articleData.value = data;
       showPreview.value = true;
 
+      // 导航到预览页面
+      router.push({
+        name: 'article-preview',
+        params: { id: new Date().getTime() },
+        query: { data: JSON.stringify(data) }
+      });
+
     } catch (error) {
       console.error('Error:', error);
       throw error;
@@ -165,7 +174,15 @@ const resetForm = () => {
   <div class="page-container">
     <!-- 文章生成表单 -->
     <div v-if="!showPreview" class="article-form">
-      <h1>灵感写手</h1>
+      <div class="header">
+        <router-link to="/" class="back-button">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z" fill="currentColor"/>
+          </svg>
+          返回首页
+        </router-link>
+        <h1>灵感写手</h1>
+      </div>
       <div class="form-container">
         <el-form
           ref="formRef"
@@ -270,17 +287,22 @@ const resetForm = () => {
   background: var(--background-color);
 }
 
-.preview-header {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
+.header {
+  max-width: 800px;
+  margin: 0 auto 40px;
   display: flex;
-  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
 }
 
 .back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text-color);
   font-weight: 500;
-  border-radius: 12px;
   transition: all 0.3s ease;
 }
 
@@ -288,21 +310,18 @@ const resetForm = () => {
   transform: translateX(-2px);
 }
 
-.article-form {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 40px 20px;
-}
-
-h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #1d1d1f;
-  text-align: center;
-  margin-bottom: 40px;
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
   background: linear-gradient(135deg, #1d1d1f 0%, #434343 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.article-form {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
 }
 
 .form-container {

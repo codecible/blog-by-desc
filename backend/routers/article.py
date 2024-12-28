@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from datetime import datetime
 import logging
 
-from backend.schemas.article import ArticleRequest, ArticleResponse, ArticleData
+from backend.schemas.article import ArticleRequest, ArticleResponse, ArticleData, TitleRequest, TitleResponse, TitleData
 from backend.schemas.errors import APIError
 from backend.services.article_generator import ArticleGenerator
 
@@ -76,4 +76,44 @@ async def generate_article(request: ArticleRequest):
         raise HTTPException(
             status_code=500,
             detail=f"生成文章失败: {str(e)}"
+        )
+
+@router.post("/generatetitle")
+async def generate_title(request: TitleRequest) -> TitleResponse:
+    """
+    生成文章标题的API接口
+
+    Args:
+        request (TitleRequest): 包含以下字段的请求对象
+            - description: 文章描述（必填，5-1000字）
+            - platform: 平台名称（必填，例如：xiaohongshu, weixin, zhihu等）
+
+    Returns:
+        TitleResponse: 包含以下字段的响应对象
+            - success: 是否成功
+            - message: 响应消息
+            - data: 包含标题内容的字典
+                - content: 生成的标题内容
+    """
+    logger.info(f"Received generate title request: {request}")
+    generator = ArticleGenerator()
+
+    try:
+        # 生成标题
+        titles = await generator.generate_titles(
+            description=request.description,
+            platform=request.platform
+        )
+
+        return TitleResponse(
+            success=True,
+            message="标题生成成功",
+            data=TitleData(content=titles[0])
+        )
+
+    except Exception as e:
+        logger.error(f"Error generating titles: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"生成标题失败: {str(e)}"
         )

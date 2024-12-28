@@ -1,13 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from '../components/HomePage.vue'
-import ArticleForm from '../components/ArticleForm.vue'
-import XiaohongshuForm from '../components/XiaohongshuForm.vue'
+import HomeView from '@/views/HomeView.vue'
+import ArticleForm from '@/components/ArticleForm.vue'
+import XiaohongshuForm from '@/components/XiaohongshuForm.vue'
+import XiaohongshuPreviewView from '@/views/XiaohongshuPreviewView.vue'
+import ArticlePreviewView from '@/views/ArticlePreviewView.vue'
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomePage
+    component: HomeView
   },
   {
     path: '/article',
@@ -15,14 +17,28 @@ const routes = [
     component: ArticleForm
   },
   {
+    path: '/article/preview/:id',
+    name: 'article-preview',
+    component: ArticlePreviewView
+  },
+  {
     path: '/xiaohongshu',
     name: 'xiaohongshu',
     component: XiaohongshuForm
+  },
+  {
+    path: '/xiaohongshu/preview/:id',
+    name: 'xiaohongshu-preview',
+    component: XiaohongshuPreviewView
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL || '/'),
   routes
 })
 

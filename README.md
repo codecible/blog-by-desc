@@ -94,10 +94,16 @@ blog-by-desc/
 │           ├── monica.py   # Monica AI客户端
 │           └── zhipu.py    # 智谱AI客户端
 ├── frontend/               # 前端代码目录
-│   ├── src/               # 源代码目录
-│   │   ├── components/    # Vue组件目录
-│   │   │   ├── ArticleForm.vue    # 文章生成表单组件
-│   │   │   └── ArticlePreview.vue # 文章预览组件
+│   ├── src/                # 源代码目录
+│   │   ├── views/          # 页面级组件目录
+│   │   │   ├── HomeView.vue                    # 首页
+│   │   │   ├── ArticlePreviewView.vue          # 文章预览页面
+│   │   │   └── XiaohongshuPreviewView.vue      # 小红书预览页面
+│   │   ├── components/    # 功能组件目录
+│   │   │   ├── ArticleForm.vue                 # 文章生成表单组件
+│   │   │   ├── ArticlePreview.vue              # 文章预览组件
+│   │   │   ├── XiaohongshuForm.vue             # 小红书表单组件
+│   │   │   └── XiaohongshuPreview.vue          # 小红书预览组件
 │   │   ├── router/        # 路由配置目录
 │   │   │   └── index.js   # 路由配置文件
 │   │   ├── App.vue        # 根组件
@@ -149,8 +155,20 @@ blog-by-desc/
 - `utils/`: 工具函数和API客户端实现
 
 #### frontend/ - 前端应用
-- `src/components/`: Vue组件，实现UI交互
+- `src/views/`: 页面级组件目录
+  * 1. 负责页面级的布局和路由管理
+  * 2. 处理页面级的状态和数据
+  * 3. 组织和管理子组件
+  * 4. 处理页面级的用户交互
+- `src/components/`: 功能组件目录
+  * 1. 实现具体的业务功能
+  * 2. 提供可复用的UI组件
+  * 3. 处理组件级的状态管理
+  * 4. 实现具体的用户交互功能
 - `src/router/`: 前端路由配置
+  * 1. 定义应用的路由结构
+  * 2. 配置路由参数和导航守卫
+  * 3. 管理页面间的跳转逻辑
 - `public/`: 静态资源文件
 - `vite.config.js`: Vite构建工具配置
 
