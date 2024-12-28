@@ -21,7 +21,7 @@ RUN yum install -y gcc gcc-c++ make curl \
     && rm -rf /var/cache/yum
 
 # 复制依赖文件
-COPY requirements.txt .
+COPY backend/requirements.txt .
 
 # 创建虚拟环境并安装依赖
 RUN python -m venv /opt/venv

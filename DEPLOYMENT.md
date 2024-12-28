@@ -9,11 +9,9 @@
 本项目采用前后端分离架构，使用 Docker 进行容器化部署，包含三个主要服务：Nginx 服务、前端构建服务和后端服务。
 
 > 部署配置说明
-- 本地开发环境：使用 `docker compose.yml`
-- 阿里云环境：使用 `docker compose.aliyun.yml`
-  * 使用阿里云优化版镜像
-  * 配置阿里云镜像加速
-  * 阿里云内可访问的镜像资源限制
+- 本地开发环境：使用 本地构建
+- 预发布环境：使用 `docker-compose.pre.yml`
+- 阿里云环境：使用 `docker-compose.aliyun.yml`
 
 ## 1. 首次部署流程
 ```bash
@@ -33,7 +31,7 @@ mkdir -p logs/nginx && chmod -R 777 logs/nginx
 # 5. Docker 网络配置（两种方案）
 
 ## 方案1：手动管理网络（推荐&默认）
-# 如果需要手动管理网络，执行：
+# 如果需要手动管理网络执行：
 docker network create blog-network
 # 然后在 docker compose.yml 中使用：
 networks:
@@ -75,10 +73,10 @@ npm run build
 ```bash
 # 本地开发
 # 基于项目根目录
-python3.11 -m venv venv              # 创建新的虚拟环境
-source venv/bin/activate         # 激活虚拟环境
-pip install --upgrade pip        # 升级pip
-pip install -r requirements.txt  # 安装依赖
+python3.11 -m venv venv                   # 创建新的虚拟环境
+source venv/bin/activate                  # 激活虚拟环境
+pip install --upgrade pip                 # 升级pip
+pip install -r backend/requirements.txt   # 安装依赖
 
 # 开启热重载
 # 方式1：使用默认配置

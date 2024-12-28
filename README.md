@@ -10,7 +10,7 @@
 - 📱 完善的移动端适配
 - 🚀 更流畅的用户体验
 - 🔒 支持Docker Compose快速部署
-- 🌩️ 支持阿里云环境部署
+- 🌩️ 支持预发布和阿里云环境部署
 - 🔄 支持多AI提供商切换（Monica AI / 智谱AI）
 - ⚡️ 优化的配置管理，使用单例模式提高性能
 
@@ -106,23 +106,19 @@ blog-by-desc/
 │   ├── package.json       # 项目依赖配置
 │   └── vite.config.js     # Vite配置文件
 ├── docker/                # Docker相关配置
-│   ├── backend.Dockerfile           # 后端服务Dockerfile
 │   ├── backend_aliyun.Dockerfile    # 阿里云专用后端Dockerfile
-│   ├── frontend.Dockerfile          # 前端服务Dockerfile
 │   ├── frontend_aliyun.Dockerfile   # 阿里云专用前端Dockerfile
-│   ├── nginx.Dockerfile             # Nginx服务Dockerfile
 │   ├── nginx_aliyun.Dockerfile      # 阿里云专用Nginx Dockerfile
 │   ├── nginx.conf                   # Nginx配置文件
 │   └── init-nginx-logs.sh           # Nginx日志初始化脚本
-├── logs/                   # 日志目录
-│   ├── app/               # 应用日志
-│   └── nginx/             # Nginx日志
-├── docker-compose.yml              # 本地开发环境配置
-├── docker-compose.pre.yml          # 预发布环境配置
-├── docker-compose.aliyun.yml       # 阿里云环境配置
-├── DEPLOYMENT.md                   # 部署说明文档
-├── CHANGELOG.md                    # 更新日志
-└── .gitignore                     # Git忽略文件
+├── logs/                  # 日志目录
+│   ├── app/              # 应用日志
+│   └── nginx/            # Nginx日志
+├── docker-compose.pre.yml         # 预发布环境配置
+├── docker-compose.aliyun.yml      # 阿里云环境配置
+├── DEPLOYMENT.md                  # 部署说明文档
+├── CHANGELOG.md                   # 更新日志
+└── .gitignore                    # Git忽略文件
 ```
 
 ### 目录功能说明
