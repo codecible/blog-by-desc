@@ -57,8 +57,8 @@ docker compose -f docker-compose.pre.pre.yml up -d --build
 ```bash
 # 本地开发
 cd frontend
-npm install #首次执行/或者有新的插件安装
-npm run dev
+npm install # 首次执行/或者有新的插件安装
+npm run dev # 默认监听3100端口
 
 # 部署更新
 # 方法1：使用 Docker（推荐）
@@ -94,9 +94,9 @@ python3.11 -m uvicorn backend.main:app --reload
 
 # 方式2：自定义配置
 # 仅本地访问
-python3.11 -m uvicorn backend.main:app --host 127.0.0.1 --port 3001 --reload
+python3.11 -m uvicorn backend.main:app --host 127.0.0.1 --port 3101 --reload
 # 允许局域网访问
-python3.11 -m uvicorn backend.main:app --host 0.0.0.0 --port 3001 --reload
+python3.11 -m uvicorn backend.main:app --host 0.0.0.0 --port 3101 --reload
 ```
 
 ## 3.预览环境

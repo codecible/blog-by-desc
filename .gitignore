@@ -28,3 +28,7 @@ htmlcov/
 
 # Cache
 cache/
+
+# Logs
+logs/
+*.log

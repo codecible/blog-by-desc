@@ -5,13 +5,14 @@ export default defineConfig({
   plugins: [
     vue()
   ],
-  
+
   server: {
-    port: 3000,
+    port: 3100,
     host: true,
+    strictPort: true,  // 如果端口被占用，不自动切换而是直接报错
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:3001',
+        target: 'http://127.0.0.1:3101',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy, options) => {

@@ -24,15 +24,15 @@ const rules = reactive({
     { required: true, message: '请输入内容描述', trigger: 'blur' },
     { min: 10, message: '描述内容至少10个字符', trigger: 'blur' },
     { max: 1000, message: '描述内容不能超过1000个字符', trigger: 'blur' },
-    { 
+    {
       validator: (rule, value, callback) => {
         if (value.trim().length < 10) {
           callback(new Error('描述内容不能全是空格'))
         } else {
           callback()
         }
-      }, 
-      trigger: 'blur' 
+      },
+      trigger: 'blur'
     }
   ],
   coreTopic: [
@@ -48,14 +48,14 @@ const getWordCount = (text) => {
 // 生成文章
 const generateArticle = async () => {
   if (!formRef.value) return
-  
+
   try {
     // 表单验证
     await formRef.value.validate()
-    
+
     loading.value = true
     errorMessage.value = ''
-    
+
     // 添加环境变量调试日志
     console.log('Environment variables:', {
       VITE_API_URL: import.meta.env.VITE_API_URL,
@@ -63,8 +63,8 @@ const generateArticle = async () => {
       DEV: import.meta.env.DEV,
       PROD: import.meta.env.PROD,
     });
-    
-    console.log('Sending request to:', `${import.meta.env.VITE_API_URL}/blog/generate`);
+
+    console.log('Sending request to:', `${import.meta.env.VITE_API_URL}/article/generate`);
     console.log('Request data:', {
       description: formData.description,
       core_idea: formData.coreTopic,
@@ -84,7 +84,7 @@ const generateArticle = async () => {
       }, 500);
 
       const response = await Promise.race([
-        fetch(`${import.meta.env.VITE_API_URL}/blog/generate`, {
+        fetch(`${import.meta.env.VITE_API_URL}/article/generate`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ const generateArticle = async () => {
           }),
           signal: controller.signal,
         }),
-        new Promise((_, reject) => 
+        new Promise((_, reject) =>
           setTimeout(() => reject(new Error('请求超时，请重试')), 300000)
         )
       ]);
@@ -105,7 +105,7 @@ const generateArticle = async () => {
       }
 
       console.log('Response status:', response.status);
-      
+
       if (!response.ok) {
         const errorText = await response.text().catch(() => '未知错误');
         console.error('Error response:', errorText);
@@ -175,8 +175,8 @@ const resetForm = () => {
           @submit.prevent
         >
           <div class="input-group">
-            <el-form-item 
-              label="内容描述" 
+            <el-form-item
+              label="内容描述"
               prop="description"
               :error="errorMessage"
             >
@@ -200,10 +200,10 @@ const resetForm = () => {
               </div>
             </el-form-item>
           </div>
-          
+
           <div class="input-group">
-            <el-form-item 
-              label="核心主题" 
+            <el-form-item
+              label="核心主题"
               prop="coreTopic"
             >
               <el-input
@@ -232,7 +232,7 @@ const resetForm = () => {
             >
               {{ buttonText }}
             </el-button>
-            
+
             <el-button
               type="default"
               @click="resetForm"
@@ -249,15 +249,15 @@ const resetForm = () => {
     <!-- 文章预览 -->
     <template v-else>
       <div class="preview-header">
-        <el-button 
-          type="default" 
+        <el-button
+          type="default"
           @click="backToForm"
           class="back-button"
         >
           返回编辑
         </el-button>
       </div>
-      <article-preview 
+      <article-preview
         :article-data="articleData"
       />
     </template>
@@ -412,22 +412,22 @@ h1 {
   .article-form {
     padding: 20px 10px;
   }
-  
+
   .form-container {
     padding: 20px;
   }
-  
+
   h1 {
     font-size: 2rem;
   }
-  
+
   .form-actions {
     flex-direction: column;
   }
-  
+
   .submit-button,
   .reset-button {
     width: 100%;
   }
 }
-</style> 
+</style>

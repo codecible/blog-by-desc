@@ -93,9 +93,9 @@ class ArticleGenerator:
                 logger.info("使用缓存的文章内容")
                 return cached_result
 
-            min_word_count = self.config.MIN_WORD_COUNT * 3
-            max_word_count = self.config.MAX_WORD_COUNT * 3
-            min_core_word_count = self.config.MIN_CORE_WORD_COUNT * 3
+            min_word_count = self.config.MIN_WORD_COUNT
+            max_word_count = self.config.MAX_WORD_COUNT
+            min_core_word_count = self.config.MIN_CORE_WORD_COUNT
 
             messages = [
                 {
@@ -105,29 +105,30 @@ class ArticleGenerator:
                             "type": "text",
                             "text": (
                                 f"你是一位经验丰富的微信公众号爆文创作者，拥有丰富的写作技巧和对热点传播的敏感度。请基于下面提供的信息，创作一篇{min_word_count} - {max_word_count}字的文章，并以markdown格式输出。\n\n"
-                                "【创作要求】\n\n"
-                                "1. 内容要求\n"
+                                f"【创作要求】\n\n"
+                                f"1. 内容要求\n"
+                                f"- 文章总字数控制在{min_word_count} - {max_word_count}之间\n"
                                 "- 主题鲜明，观点突出\n"
-                                "- 论证充分，案例丰富\n"
-                                "- 结构清晰，层次分明\n"
+                                "- 可以有二级标题，不要写小标题\n"
                                 "- 语言生动，表达流畅\n"
+                                "- 避免表情符号，请勿使用表情符号\n"
                                 f"- 特别强调，必须要遵循的：每个主题下的数据字数不少于{min_core_word_count}个字 。写完后请注意检查是否符合标准\n"
                                 "2. 写作技巧\n"
-                                "- 开篇要吸引读者注意\n"
-                                "- 善用故事化表达\n"
-                                "- 适当运用数据支撑\n"
-                                "- 结尾给出思考启发\n\n"
+                                "**标题**：吸引人，能够引发读者点击，不超过20个字。\n"
+                                "**开头**： 开头要吸引读者注意，不超过100个字。\n"
+                                "**内容（一定要遵守，会有人工审核的哦）***：\n"
+                                "- **自然融入**：数据和案例应自然融入文章，避免使用“数据支撑”、“案例”等突兀词汇。\n"
+                                "- **丰富性**：每段文字都要丰富、有理有据，包含具体案例、数据支撑或引用权威观点，但需自然嵌入。\n"
+                                "- 使用相关数据或研究结果，提升内容的可信度。\n"
+                                "- 通过故事情节或情感表达，引发读者的共鸣。\n"
+                                "- 在适当位置设置互动性问题，增加读者的参与感。\n\n"
                                 "3. 格式规范\n"
                                 "- 使用markdown语法\n"
                                 "- 标题层级清晰(#、##、###)\n"
                                 "- 重点内容加粗(**文字**)\n"
                                 "- 适当使用列表和引用\n"
                                 "- 段落间留出适当空行\n\n"
-                                "请确保文章:\n"
-                                "1. 符合专业性要求\n"
-                                "2. 内容通俗易懂\n"
-                                "3. 观点论证充分\n"
-                                "4. 文章流畅自然"
+                                "请确保文章符合以上要求，适合微信公众号发布。"
                             )
                         }
                     ]

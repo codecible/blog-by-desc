@@ -5,16 +5,16 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
 
 # 第三方库导入
-import fastapi
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 # 本地应用导入
 from backend.routers import article
+from backend.utils.paths import LOG_DIR
+
 ###################
 # 初始化配置
 ###################
@@ -46,12 +46,8 @@ if str(BACKEND_DIR) not in sys.path:
 # 日志配置
 ###################
 
-# 确保日志目录存在
-log_dir = os.path.join(Path(__file__).resolve().parent, 'logs', 'app')
-os.makedirs(log_dir, exist_ok=True)
-
 # 生成日志文件名
-log_file = os.path.join(log_dir, f"{datetime.datetime.now().strftime('%Y%m%d')}.log")
+log_file = os.path.join(LOG_DIR, f"{datetime.datetime.now().strftime('%Y%m%d')}.log")
 
 # 配置日志格式
 logging.basicConfig(
