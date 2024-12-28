@@ -165,7 +165,7 @@ const resetForm = () => {
   <div class="page-container">
     <!-- 文章生成表单 -->
     <div v-if="!showPreview" class="article-form">
-      <h1>AI文章生成器</h1>
+      <h1>灵感写手</h1>
       <div class="form-container">
         <el-form
           ref="formRef"

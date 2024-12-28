@@ -22,19 +22,38 @@ const copySuccess = ref(false)
 // 复制文章内容到剪贴板
 const copyContent = async () => {
   try {
+    // 尝试使用 Clipboard API
     await navigator.clipboard.writeText(content.value)
-    ElMessage({
-      message: '文章内容已复制到剪贴板',
-      type: 'success',
-      duration: 2000
-    })
-    copySuccess.value = true
-    setTimeout(() => {
-      copySuccess.value = false
-    }, 2000)
+    showCopySuccess()
   } catch (err) {
-    ElMessage.error('复制失败，请手动复制')
+    // 备用方案：使用传统的复制方法
+    try {
+      const textarea = document.createElement('textarea')
+      textarea.value = content.value
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      showCopySuccess()
+    } catch (fallbackErr) {
+      ElMessage.error('复制失败，请手动复制')
+    }
   }
+}
+
+// 显示复制成功提示
+const showCopySuccess = () => {
+  ElMessage({
+    message: '文章内容已复制到剪贴板',
+    type: 'success',
+    duration: 2000, // 提示消息显示时长，单位为毫秒
+  })
+  copySuccess.value = true
+  setTimeout(() => {
+    copySuccess.value = false
+  }, 2000)
 }
 
 // 下载文章为Markdown文件
