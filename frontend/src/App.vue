@@ -1,5 +1,24 @@
 <script setup>
-// App.vue
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// 根据路由更新标题
+watch(() => route.path, (to) => {
+  // 可以根据不同的路由设置不同的标题后缀
+  const baseTitle = import.meta.env.VITE_APP_TITLE
+  switch(to) {
+    case '/article':
+      document.title = `文章生成 | ${baseTitle}`
+      break
+    case '/xiaohongshu':
+      document.title = `小红书标题生成 | ${baseTitle}`
+      break
+    default:
+      document.title = baseTitle
+  }
+})
 </script>
 
 <template>
@@ -43,4 +62,4 @@ body {
     padding: 10px;
   }
 }
-</style> 
+</style>

@@ -1,6 +1,6 @@
 <template>
   <div class="home-container">
-    <h1 class="title">创意伙伴</h1>
+    <h1 class="title">KD Tools Hub</h1>
     <div class="cards-container">
 
     <!-- 小红书文案卡片 -->
@@ -60,12 +60,40 @@
 }
 
 .title {
-  font-size: 48px;
-  font-weight: 700;
+  font-size: 56px;
+  font-weight: 800;
   margin-bottom: 40px;
-  background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #34c759 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  position: relative;
+  display: inline-block;
+  padding: 0 20px;
+}
+
+.title::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #34c759 100%);
+  opacity: 0.2;
+  border-radius: 50%;
 }
 
 .cards-container {
@@ -148,6 +176,18 @@
   .title {
     font-size: 36px;
     margin-bottom: 30px;
+  }
+
+  .title::before {
+    width: 40px;
+    height: 3px;
+  }
+
+  .title::after {
+    width: 15px;
+    height: 15px;
+    top: -8px;
+    right: -8px;
   }
 
   .cards-container {

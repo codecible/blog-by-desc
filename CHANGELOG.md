@@ -7,6 +7,10 @@
 
 ## Unreleased
 
+### Changed
+- 优化首页标题样式
+- SEO优化
+- 增加favicon
 ## [1.1.0] - 2024-12-29
 ### Added
 - 新增小红书标题生成功能
