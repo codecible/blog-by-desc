@@ -2,27 +2,8 @@
   <div class="home-container">
     <h1 class="title">创意伙伴</h1>
     <div class="cards-container">
-      <!-- 文章生成器卡片 -->
-      <router-link to="/article" class="card">
-        <div class="card-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- 纸张背景 -->
-            <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" fill="var(--background-color)" stroke="currentColor" stroke-width="1.5"/>
-            <!-- 纸张上的横线 -->
-            <path d="M7 8H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M7 16H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <!-- 钢笔 -->
-            <path d="M16.5 15.5L19 13L20 14L17.5 16.5L16.5 15.5Z" fill="currentColor"/>
-            <path d="M16.5 15.5L15.5 16.5L14 20L17.5 16.5L16.5 15.5Z" fill="currentColor"/>
-          </svg>
-        </div>
-        <h2>📝一键写文章｜提升创作效率💫</h2>
-        <p class="keynote">输入核心主题，自动帮你生成公众号文章！</p>
-        <p>智能分析主题重点，自动构建文章框架。让创作者告别写作焦虑，轻松打造优质文章。支持多种写作风格，让你的公众号创作事半功倍～</p>
-      </router-link>
 
-      <!-- 小红书文案卡片 -->
+    <!-- 小红书文案卡片 -->
       <router-link to="/xiaohongshu" class="card">
         <div class="card-icon">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -45,6 +26,27 @@
         <p class="keynote">还在为写跑步标题发愁吗？</p>
         <p>只需输入想表达的内容，自动帮你生成10个不同风格的小红书标题！包含励志、干货、治愈等多种风格，智能匹配emoji，让跑步博主的创作之路不再有标题困扰～</p>
     </router-link>
+
+      <!-- 文章生成器卡片 -->
+      <router-link to="/article" class="card">
+        <div class="card-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 纸张背景 -->
+            <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" fill="var(--background-color)" stroke="currentColor" stroke-width="1.5"/>
+            <!-- 纸张上的横线 -->
+            <path d="M7 8H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M7 16H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- 钢笔 -->
+            <path d="M16.5 15.5L19 13L20 14L17.5 16.5L16.5 15.5Z" fill="currentColor"/>
+            <path d="M16.5 15.5L15.5 16.5L14 20L17.5 16.5L16.5 15.5Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h2>📝一键写文章｜提升创作效率💫</h2>
+        <p class="keynote">输入核心主题，自动帮你生成公众号文章！</p>
+        <p>智能分析主题重点，自动构建文章框架。让创作者告别写作焦虑，轻松打造优质文章。支持多种写作风格，让你的公众号创作事半功倍～</p>
+      </router-link>
+
     </div>
   </div>
 </template>
