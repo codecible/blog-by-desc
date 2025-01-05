@@ -40,9 +40,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.setLevel(log_level)
 
-# 配置uvicorn访问日志
+# 创建一个过滤器来过滤健康检查日志
+class HealthCheckFilter(logging.Filter):
+    def filter(self, record):
+        return "GET /health" not in record.getMessage()
+
+# 为uvicorn访问日志添加过滤器
 uvicorn_access_logger = logging.getLogger("uvicorn.access")
-uvicorn_access_logger.setLevel(log_level)
+uvicorn_access_logger.setLevel(log_level)  # 保持与全局日志级别一致
+uvicorn_access_logger.addFilter(HealthCheckFilter())
+
+# 为应用日志添加过滤器
+logger.addFilter(HealthCheckFilter())
+
 handler = logging.StreamHandler()
 handler.setFormatter(
     logging.Formatter(
@@ -51,18 +61,6 @@ handler.setFormatter(
     )
 )
 uvicorn_access_logger.handlers = [handler]
-
-# 创建一个专门的健康检查logger
-health_logger = logging.getLogger("health_check")
-health_logger.setLevel(logging.DEBUG)  # 设置为最低级别，相当于TRACE
-health_handler = logging.StreamHandler()
-health_handler.setFormatter(
-    logging.Formatter(
-        '%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
-)
-health_logger.handlers = [health_handler]
 
 ###################
 # 初始化配置
@@ -191,15 +189,7 @@ async def root():
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     """请求日志中间件"""
-    # 健康检查请求使用专门的logger
-    if request.url.path == "/health":
-        response = await call_next(request)
-        # 只有在健康检查失败时才记录日志
-        if response.status_code != 200:
-            health_logger.error(f"Health check failed with status code: {response.status_code}")
-        return response
-
-    # 其他请求使用INFO级别日志
+    # 记录所有请求，过滤器会自动过滤掉健康检查请求
     logger.info(f"Request: {request.method} {request.url.path}")
     response = await call_next(request)
     logger.info(f"Response: {response.status_code}")
