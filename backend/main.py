@@ -39,12 +39,10 @@ logging.basicConfig(
 # 获取应用的logger
 logger = logging.getLogger(__name__)
 logger.setLevel(log_level)
-logger.info(f"Setting log level to: {logging.getLevelName(log_level)}")
-logger.info(f"日志文件位置: {log_file}")
 
 # 配置uvicorn访问日志
 uvicorn_access_logger = logging.getLogger("uvicorn.access")
-uvicorn_access_logger.setLevel(log_level)
+uvicorn_access_logger.setLevel(logging.WARNING)  # 设置为WARNING级别，避免记录正常请求
 handler = logging.StreamHandler()
 handler.setFormatter(
     logging.Formatter(
@@ -53,6 +51,10 @@ handler.setFormatter(
     )
 )
 uvicorn_access_logger.handlers = [handler]
+
+# 创建一个专门的健康检查logger
+health_logger = logging.getLogger("health_check")
+health_logger.setLevel(logging.WARNING)  # 只记录警告和错误
 
 ###################
 # 初始化配置
@@ -181,13 +183,12 @@ async def root():
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     """请求日志中间件"""
-    # 健康检查请求使用DEBUG级别日志
+    # 健康检查请求使用专门的logger
     if request.url.path == "/health":
-        logger.debug(f"Health check request: {request.method} {request.url.path}")
         response = await call_next(request)
-        # 只有在健康检查失败时才记录ERROR日志
+        # 只有在健康检查失败时才记录日志
         if response.status_code != 200:
-            logger.error(f"Health check failed with status code: {response.status_code}")
+            health_logger.error(f"Health check failed with status code: {response.status_code}")
         return response
 
     # 其他请求使用INFO级别日志
