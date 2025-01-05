@@ -16,6 +16,45 @@ from backend.routers import article
 from backend.utils.paths import LOG_DIR
 
 ###################
+# 日志配置
+###################
+
+# 生成日志文件名
+log_file = os.path.join(LOG_DIR, f"{datetime.datetime.now().strftime('%Y%m%d')}.log")
+
+# 根据环境设置日志级别
+log_level = logging.INFO if os.getenv("ENVIRONMENT") == "production" else logging.DEBUG
+
+# 配置日志格式
+logging.basicConfig(
+    level=log_level,
+    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    handlers=[
+        logging.StreamHandler(),  # 输出到控制台
+        logging.FileHandler(log_file, encoding='utf-8')  # 输出到文件
+    ]
+)
+
+# 获取应用的logger
+logger = logging.getLogger(__name__)
+logger.setLevel(log_level)
+logger.info(f"Setting log level to: {logging.getLevelName(log_level)}")
+logger.info(f"日志文件位置: {log_file}")
+
+# 配置uvicorn访问日志
+uvicorn_access_logger = logging.getLogger("uvicorn.access")
+uvicorn_access_logger.setLevel(log_level)
+handler = logging.StreamHandler()
+handler.setFormatter(
+    logging.Formatter(
+        '%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+)
+uvicorn_access_logger.handlers = [handler]
+
+###################
 # 初始化配置
 ###################
 
@@ -38,45 +77,6 @@ load_env_file()
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 if str(BACKEND_DIR) not in sys.path:
     sys.path.append(str(BACKEND_DIR))
-
-###################
-# 日志配置
-###################
-
-# 生成日志文件名
-log_file = os.path.join(LOG_DIR, f"{datetime.datetime.now().strftime('%Y%m%d')}.log")
-
-# 根据环境设置日志级别
-log_level = logging.INFO if os.getenv("ENVIRONMENT") == "production" else logging.DEBUG
-logger.info(f"Setting log level to: {logging.getLevelName(log_level)}")
-
-# 配置日志格式
-logging.basicConfig(
-    level=log_level,
-    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    handlers=[
-        logging.StreamHandler(),  # 输出到控制台
-        logging.FileHandler(log_file, encoding='utf-8')  # 输出到文件
-    ]
-)
-
-# 获取应用的logger
-logger = logging.getLogger(__name__)
-logger.setLevel(log_level)
-logger.info(f"日志文件位置: {log_file}")
-
-# 配置uvicorn访问日志
-uvicorn_access_logger = logging.getLogger("uvicorn.access")
-uvicorn_access_logger.setLevel(log_level)
-handler = logging.StreamHandler()
-handler.setFormatter(
-    logging.Formatter(
-        '%(asctime)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
-)
-uvicorn_access_logger.handlers = [handler]
 
 ###################
 # FastAPI 应用配置

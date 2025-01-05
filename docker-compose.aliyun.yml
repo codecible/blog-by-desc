@@ -92,7 +92,7 @@ services:
         reservations:
           cpus: '1.0'
           memory: 2G
-    command: uvicorn backend.main:app --host 0.0.0.0 --port 3001 --workers 8 --timeout-keep-alive 600 --timeout-graceful-shutdown 600
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 3001 --workers 8 --timeout-keep-alive 600 --timeout-graceful-shutdown 600 --log-level info
     environment:
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
