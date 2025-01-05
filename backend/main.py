@@ -43,16 +43,28 @@ logger.setLevel(log_level)
 # 创建一个过滤器来过滤健康检查日志
 class HealthCheckFilter(logging.Filter):
     def filter(self, record):
-        return "GET /health" not in record.getMessage()
+        # 检查日志消息中是否包含健康检查的URL
+        if "GET /health" in str(record.getMessage()):
+            return False
+        # 检查日志消息中是否包含健康检查的路径
+        if hasattr(record, 'scope') and record.scope.get('path') == '/health':
+            return False
+        return True
 
-# 为uvicorn访问日志添加过滤器
+# 为所有相关的logger添加过滤器
+loggers_to_filter = [
+    "uvicorn.access",  # uvicorn访问日志
+    "fastapi",         # FastAPI日志
+    __name__,          # 当前模块的日志
+]
+
+for logger_name in loggers_to_filter:
+    logger = logging.getLogger(logger_name)
+    logger.addFilter(HealthCheckFilter())
+
+# 配置uvicorn访问日志
 uvicorn_access_logger = logging.getLogger("uvicorn.access")
 uvicorn_access_logger.setLevel(log_level)  # 保持与全局日志级别一致
-uvicorn_access_logger.addFilter(HealthCheckFilter())
-
-# 为应用日志添加过滤器
-logger.addFilter(HealthCheckFilter())
-
 handler = logging.StreamHandler()
 handler.setFormatter(
     logging.Formatter(
