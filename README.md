@@ -56,6 +56,11 @@
 ## 配置说明
 
 ### 环境变量配置
+项目使用统一的 `.env` 文件管理环境变量，通过 `ENVIRONMENT` 环境变量区分不同环境：
+- `ENVIRONMENT=production`: 生产环境
+- `ENVIRONMENT=pre`: 预发布环境
+
+主要配置项：
 - `AI_PROVIDER`: AI提供商选择（"monica"或"zhipu"）
 - `MONICA_API_KEY`: Monica AI的API密钥
 - `ZHIPU_API_KEY`: 智谱AI的API密钥
@@ -63,6 +68,8 @@
 - `ZHIPU_MODEL`: 智谱AI的模型名称
 
 ### 配置管理特性
+- 使用统一的 .env 文件，简化配置管理
+- 支持通过环境变量区分不同环境
 - 使用单例模式管理配置，确保全局配置一致性
 - 支持运行时动态切换AI提供商
 - 自动验证配置有效性
@@ -81,7 +88,7 @@ blog-by-desc/
 │   ├── config.py           # 配置管理
 │   ├── requirements.txt    # Python依赖包
 │   ├── .env.example        # 环境变量示例文件
-│   ├── .env                # 环境变量配置文件
+│   ├── .env                # 环境变量配置文件（统一配置文件）
 │   ├── routers/            # 路由处理目录
 │   │   └── article.py      # 文章相关路由
 │   ├── services/           # 服务层目录

@@ -72,10 +72,11 @@ services:
     expose:
       - "3001"
     env_file:
-      - backend/.env.production
+      - backend/.env
     volumes:
       - ./logs:/app/logs:rw
       - ./output:/app/output:rw
+      - ./backend/.env:/app/backend/.env:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
       interval: 30s

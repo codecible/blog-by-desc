@@ -77,10 +77,10 @@ USER appuser
 EXPOSE 3001
 
 # 修改工作目录确保Python包导入正确
-WORKDIR /app/backend
+WORKDIR /app
 
 # 启动命令
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3001", "--workers", "4"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "3001", "--workers", "4"]
 
 # 容器内目录结构
 # /app/

@@ -21,19 +21,16 @@ from backend.utils.paths import LOG_DIR
 
 # 加载环境变量文件
 def load_env_file():
-    """加载环境变量文件，按优先级从高到低尝试加载"""
+    """加载环境变量文件"""
     current_dir = Path(__file__).resolve().parent
-    env_files = [
-        current_dir / '.env',                    # 本地开发环境
-        current_dir / '.env.production',         # 生产环境
-    ]
+    env_file = current_dir / '.env'
 
-    for env_file in env_files:
-        if env_file.exists():
-            load_dotenv(env_file, override=True)  # 保持 override=True 来强制重新加载
-            print(f"已加载环境变量文件: {env_file}")
-            return
-    print("警告：未找到任何环境变量文件")
+    if env_file.exists():
+        load_dotenv(env_file, override=True)
+        logger.info(f"已加载环境变量文件: {env_file}")
+    else:
+        logger.warning("警告：未找到环境变量文件 .env")
+        raise FileNotFoundError("未找到必需的环境变量文件 .env")
 
 load_env_file()
 
