@@ -42,7 +42,7 @@ logger.setLevel(log_level)
 
 # 配置uvicorn访问日志
 uvicorn_access_logger = logging.getLogger("uvicorn.access")
-uvicorn_access_logger.setLevel(logging.WARNING)  # 设置为WARNING级别，避免记录正常请求
+uvicorn_access_logger.setLevel(log_level)
 handler = logging.StreamHandler()
 handler.setFormatter(
     logging.Formatter(
@@ -54,7 +54,15 @@ uvicorn_access_logger.handlers = [handler]
 
 # 创建一个专门的健康检查logger
 health_logger = logging.getLogger("health_check")
-health_logger.setLevel(logging.WARNING)  # 只记录警告和错误
+health_logger.setLevel(logging.DEBUG)  # 设置为最低级别，相当于TRACE
+health_handler = logging.StreamHandler()
+health_handler.setFormatter(
+    logging.Formatter(
+        '%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+)
+health_logger.handlers = [health_handler]
 
 ###################
 # 初始化配置
