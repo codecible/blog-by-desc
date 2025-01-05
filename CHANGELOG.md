@@ -7,6 +7,13 @@
 
 ## Unreleased
 
+### Changed
+- 移除健康检查功能
+  * 删除后端 `/health` 端点
+  * 移除 Docker Compose 配置中的健康检查
+  * 移除 Dockerfile 中的健康检查指令
+  * 简化容器配置管理
+
 ## [1.1.2] - 2025-01-05
 ### Changed
 - 统一环境变量配置管理

@@ -77,12 +77,6 @@ services:
       - ./logs:/app/logs:rw
       - ./output:/app/output:rw
       - ./backend/.env:/app/backend/.env:ro
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
     restart: always
     networks:
       - app-network

@@ -131,11 +131,6 @@ app.add_middleware(
 # 注册路由
 app.include_router(article.router, prefix="/article")
 
-@app.get("/health")
-async def health_check():
-    """健康检查端点"""
-    return {"status": "healthy", "timestamp": datetime.datetime.now().isoformat()}
-
 @app.get("/")
 async def root():
     """API根路径"""
