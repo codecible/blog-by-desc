@@ -33,3 +33,4 @@ cache/
 logs/
 *.log
 .DS_Store
+Claude.md

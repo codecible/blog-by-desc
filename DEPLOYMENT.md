@@ -1,5 +1,15 @@
 # 部署和操作手册
 
+## 总结
+- **开发环境**： 部署在本地， `npm run dev` 通过 **vite** 负责 proxy。代理转发配置：frontend/vite.config.js
+localhost:3100/api/xxx → Vite proxy → 127.0.0.1:3101/xxx
+>
+- **生产环境**： 部署在云端，现在是aliyun。通过 `docker composer` 来部署。前端代码会在编译后生成静态文件，由 nginx 负责 proxy。 
+hostname/api/xxx → Nginx(80) → backend:3001/xxx
+> 
+- **预生产环境**：本地模拟生产环境，通过docker composer部署服务。确保上线后不会因为配置文件等原因导致错误。
+
+
 ## 环境要求
 - Python 3.11 或 3.12（不支持 Python 3.13）
 - Node.js 18+ LTS 版本
@@ -13,7 +23,7 @@
 - 预发布环境：使用 `docker-compose.pre.yml`
 - 阿里云环境：使用 `docker-compose.aliyun.yml`
 
-## 1. 首次部署流程
+## 首次部署流程
 ```bash
 # 1. 确保 Docker 和 Docker Compose 已安装
 
@@ -48,19 +58,20 @@ networks:
     driver: bridge
 
 # 6. 启动所有服务
-docker compose -f docker-compose.pre.pre.yml up -d --build
+docker compose -f docker-compose.pre.yml up -d --build
 ```
 
-## 2. 日常开发流程
+## 开发流程
 
 ### 前端开发
+#### 1. 本地开发
 ```bash
-# 本地开发
 cd frontend
 npm install # 首次执行/或者有新的插件安装
 npm run dev # 默认监听3100端口
-
-# 部署更新
+```
+#### 2. 部署更新
+```bash
 # 方法1：使用 Docker（推荐）
 docker compose up --build frontend
 
@@ -99,7 +110,7 @@ python3.11 -m uvicorn backend.main:app --host 127.0.0.1 --port 3101 --reload
 python3.11 -m uvicorn backend.main:app --host 0.0.0.0 --port 3101 --reload
 ```
 
-## 3.预览环境
+## 预览环境
 - 上线前在预览环境进行测试访问，和正式环境更新一样，均采用docker compose
 ```bash
 # 创建外部网络（如果尚未创建）
@@ -109,7 +120,9 @@ docker network create blog-network
 docker compose -f docker-compose.pre.yml up -d
 ```
 
-## 4.正式上线
+## 正式环境
+> git操作，切换到worker账户进行 `su - worker`
+
 ```bash
 # 创建外部网络（如果尚未创建）
 docker network create blog-network
@@ -120,30 +133,26 @@ docker compose up -d
 # docker compose -f docker-compose.aliyun.yml up -d
 ```
 
-## 4. 常用运维操作
-
-### 查看日志
+## 运维管理
+日志：
 ```bash
 # 查看所有服务日志
 docker compose logs -f
-
 # 查看特定服务日志
 docker compose logs -f nginx
-```t
+```
 
-### 服务管理
+服务：
 ```bash
 # 停止所有服务
 docker compose down
-
 # 重启特定服务
 docker compose restart nginx
-
 # 查看服务状态
 docker compose ps
 ```
 
-### 清理和重置
+清理和重置：
 ```bash
 # 完全清理（包括容器、网络、卷）
 docker compose down -v
@@ -153,7 +162,7 @@ docker compose [-f docker-compose.aliyun.yml] up [-d] [--build [--no-cache] [ngi
 ```
 
 
-## 各容器关联
+## 容器间关联关系
 1. frontend容器负责构建(build)，完成后自动退出
 2. 构建产物通过volume(frontend_build)持久化
 3. nginx容器挂载这个volume来提供静态文件服务

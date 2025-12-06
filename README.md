@@ -1,6 +1,6 @@
 # AI 文章生成器 v0.2.0
 
-这是一个基于Monica AI的智能文章生成工具，可以根据用户提供的描述和核心主题自动生成高质量的文章。现在支持多种AI提供商，包括Monica AI和智谱AI。
+这是一个基于AI的智能文章生成工具，可以根据用户提供的描述和核心主题自动生成高质量的文章。现在支持多种AI提供商，包括Monica AI和智谱AI。
 
 ## 最新更新
 
@@ -58,7 +58,7 @@
 ### 环境变量配置
 项目使用统一的 `.env` 文件管理环境变量，通过 `ENVIRONMENT` 环境变量区分不同环境：
 - `ENVIRONMENT=production`: 生产环境
-- `ENVIRONMENT=pre`: 预发布环境
+- `ENVIRONMENT=pre`: 预发布环境（开发环境）
 
 主要配置项：
 - `AI_PROVIDER`: AI提供商选择（"monica"或"zhipu"）
